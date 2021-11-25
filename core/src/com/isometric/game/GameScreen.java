@@ -1,0 +1,60 @@
+package com.isometric.game;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
+public class GameScreen extends ScreenAdapter {
+    @SuppressWarnings("FieldMayBeFinal")
+    private SpriteBatch batch;
+    private OrthographicCamera camera;
+//  Screen Size
+    public static final int HEIGHT = 180 * 5;
+    public static final int WIDTH = 320 * 5;
+    private IsometricRenderer renderer;
+
+    public GameScreen(SpriteBatch batch) {
+        this.batch = batch;
+    }
+
+    @Override
+    public void show() {
+        camera = new OrthographicCamera(WIDTH, HEIGHT);
+        //noinspection IntegerDivisionInFloatingPointContext
+        camera.position.set(0, HEIGHT / 2, 10);
+        renderer = new IsometricRenderer();
+    }
+
+    @Override
+    public void render(float delta) {
+//        Delta is the time between frames
+        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
+        camera.update();
+        handleInput();
+//      All rendering in libgdx is done in the sprite batch
+        batch.begin();
+        renderer.drawGround(batch);
+        renderer.drawCoordinates(batch);
+        batch.end();
+    }
+
+    @Override
+    public void dispose() {}
+
+    private void handleInput() {
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
+            if (camera.zoom >= 0.65f) {camera.zoom -= 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
+            if (camera.zoom <= 3.25f) {camera.zoom += 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.W)) {camera.position.y += 1 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.S)) {camera.position.y -= 1 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {camera.position.x -= 1 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {camera.position.x += 1 + camera.zoom;}
+//        System.out.println(camera.zoom);
+    }
+}

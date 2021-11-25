@@ -25,36 +25,49 @@ public class GameScreen extends ScreenAdapter {
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         //noinspection IntegerDivisionInFloatingPointContext
         camera.position.set(0, HEIGHT / 2, 10);
+        camera.zoom = 0.625f;
         renderer = new IsometricRenderer();
     }
 
     @Override
     public void render(float delta) {
 //        Delta is the time between frames
-        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
         camera.update();
         handleInput();
 //      All rendering in libgdx is done in the sprite batch
         batch.begin();
-        renderer.drawGround(batch);
-        renderer.drawCoordinates(batch);
+        renderer.drawOcean(batch);
+        renderer.drawGrass(batch);
+        renderer.drawBeach(batch);
+//        renderer.drawCoordinates(batch);
         batch.end();
     }
 
     @Override
     public void dispose() {}
 
+
     private void handleInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
-            if (camera.zoom >= 0.65f) {camera.zoom -= 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
-            if (camera.zoom <= 3.25f) {camera.zoom += 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {camera.position.y += 1 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {camera.position.y -= 1 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {camera.position.x -= 1 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {camera.position.x += 1 + camera.zoom;}
+//        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
+//            if (camera.zoom >= 0.35f) {camera.zoom -= 0.004f;}
+//        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
+//            if (camera.zoom <= 0.625f) {camera.zoom += 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.UP))
+            if  (camera.position.y <= 28*64)
+                {camera.position.y += 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            if (camera.position.y >= 4.5*64)
+                {camera.position.y -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            if (camera.position.x >= -24*64)
+                {camera.position.x -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            if (camera.position.x <= 25*64)
+                {camera.position.x += 3 + camera.zoom;}
 //        System.out.println(camera.zoom);
+//        System.out.println(camera.position.x + ", " + camera.position.y);
     }
 }

@@ -39,10 +39,8 @@ public class GameScreen extends ScreenAdapter {
         handleInput();
 //      All rendering in libgdx is done in the sprite batch
         batch.begin();
-        renderer.drawOcean(batch);
-        renderer.drawGrass(batch);
-        renderer.drawBeach(batch);
-//        renderer.drawCoordinates(batch);
+        renderer.drawBoard(batch);
+//        renderer.drawCoordinates(batch, true);
         batch.end();
     }
 
@@ -51,23 +49,16 @@ public class GameScreen extends ScreenAdapter {
 
 
     private void handleInput() {
-//        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
-//            if (camera.zoom >= 0.35f) {camera.zoom -= 0.004f;}
-//        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
-//            if (camera.zoom <= 0.625f) {camera.zoom += 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.UP))
-            if  (camera.position.y <= 28*64)
-                {camera.position.y += 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            if (camera.position.y >= 4.5*64)
-                {camera.position.y -= 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            if (camera.position.x >= -24*64)
-                {camera.position.x -= 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            if (camera.position.x <= 25*64)
-                {camera.position.x += 3 + camera.zoom;}
-//        System.out.println(camera.zoom);
-//        System.out.println(camera.position.x + ", " + camera.position.y);
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {camera.position.y += 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {camera.position.y -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {camera.position.x -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {camera.position.x += 3 + camera.zoom;}
+/*
+        Todo: set boundaries on the map (later in development)
+        System.out.println(camera.zoom);
+        System.out.println(camera.position.x + ", " + camera.position.y);
+*/
     }
 }

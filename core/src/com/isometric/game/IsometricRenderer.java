@@ -1,89 +1,83 @@
 package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.util.LinkedList;
-import java.util.Random;
-import java.awt.Point;
-
 public class IsometricRenderer {
 
+
+//    Todo load this from texture handler
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
+    public int board_size = 63;
 
-    Texture water_shallow;
-    Texture pinpoint;
-    Texture island_grass;
-
-    int board_size = 64;
-    int islands_to_spawn = 40;
-    @SuppressWarnings("FieldMayBeFinal")
-    private LinkedList<Point> grass_locations = new LinkedList<Point>();
+//    These are globals
+//    For drawCoords, placed here for efficiency.
+    public TextureHandler tiles = new TextureHandler();
+    private final BitmapFont coordsFont = new BitmapFont();
+    private final Texture pinpoint = new Texture(Gdx.files.internal("pinpoint.png"));
+    public FileHandle handle = Gdx.files.local("map.level");
+    public String map_string = handle.readString();
+    public String[] map = map_string.split("\\r?\\n");
 
     public IsometricRenderer() {
-        water_shallow = new Texture(Gdx.files.internal("ts_shallow0/straight/45/0.png"));
-        pinpoint = new Texture(Gdx.files.internal("pinpoint.png"));
-        island_grass = new Texture(Gdx.files.internal("ts_grass0/straight/45/0.png"));
-
-        Random rand = new Random();
-        for (int i=islands_to_spawn; i>=1; i--) {
-            Point point = new Point(rand.nextInt(board_size-10)+5, rand.nextInt(board_size-10)+5);
-            grass_locations.add(point);
-        }
-        System.out.println(grass_locations);
+//      This runs once; the constructor.
     }
 
-    public void drawCoordinates(SpriteBatch batch) {
-        BitmapFont font = new BitmapFont();
-
-        //noinspection DuplicatedCode
+    /** This is used for debug and should not be deleted.
+     * Coordinates are drawn down and to the right of the pinpoint they are linked to.
+     * @param batch Current sprite batch
+     * @param drawTextCoords true if draw text coordinates.
+     */
+    @SuppressWarnings("unused")
+    public void drawCoordinates(SpriteBatch batch, boolean drawTextCoords) {
+        float x;
+        float y;
         for (int row = board_size; row >= 0; row--) {
             for (int col = board_size; col >= 0; col--) {
-                float x = (col - row) * (small_tile_width /2f);
-                float y = (col + row) * (small_tile_height /4f);
+                x = (col - row) * (small_tile_width / 2f);
+                y = ((col + row) * (small_tile_height / 4f)) - 17;
+                if (drawTextCoords) {
+                    coordsFont.draw(batch, ("(" + row + ", " + col + ")"), x + (small_tile_width / 2f), y + (small_tile_height / 2f));
+                }
                 batch.draw(pinpoint, x, y);
             }
         }
-
-        for (int row = board_size; row >= 0; row--) {
-            for (int col = board_size; col >= 0; col--) {
-                float x = (col - row) * (small_tile_width/2f);
-                float y = (col + row) * (small_tile_height/4f);
-                font.draw(batch, ( "(" + row + ", " + col + ")"), x+(small_tile_width /2f), y+(small_tile_height /2f));
-            }
-        }
     }
 
+    public void drawBoard(SpriteBatch batch) {
+        String axis;
+        char ch;
+        float x;
+        float y;
+        int t;
 
-    public void drawOcean(SpriteBatch batch) {
+        map_string = handle.readString();
+        map = map_string.split("\\r?\\n");
+
         for (int row = board_size; row >= 0; row--) {
+             axis = map[row];
+
             for (int col = board_size; col >= 0; col--) {
-                Point point = new Point(row, col);
-                if (!grass_locations.contains(point)) {
-                    float x = (col - row) * (small_tile_width / 2f);
-                    float y = (col + row) * (small_tile_height / 4f);
-                    batch.draw(water_shallow, x, y);
+
+                x = (col - row) * (small_tile_width / 2f);
+                y = (col + row) * (small_tile_height / 4f);
+                ch = axis.charAt(col);
+
+                if (Character.isDigit(ch)) {
+                    t = Character.getNumericValue(ch);
                 }
-            }
-        }
-    }
-
-    public void drawGrass(SpriteBatch batch) {
-        for (int row = board_size; row >= 0; row--) {
-            for (int col = board_size; col >= 0; col--) {
-                Point point = new Point(row, col);
-                if (grass_locations.contains(point)) {
-                    float x = (col - row) * (small_tile_width / 2f);
-                    float y = (col + row) * (small_tile_height / 4f);
-                    batch.draw(island_grass, x, y);
+                else {
+                    t = (int)ch - (int)'a' + 10;
                 }
+
+                batch.draw(tiles.tilemap[t], x, y);
             }
         }
-    }
-
-    public void drawBeach(SpriteBatch batch) {
     }
 }
+
+

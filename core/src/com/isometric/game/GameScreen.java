@@ -10,11 +10,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class GameScreen extends ScreenAdapter {
     @SuppressWarnings("FieldMayBeFinal")
     private SpriteBatch batch;
-    private OrthographicCamera camera;
+    public OrthographicCamera camera;
 //  Screen Size
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
     private IsometricRenderer renderer;
+    private PlayerShip player;
 
     public GameScreen(SpriteBatch batch) {
         this.batch = batch;
@@ -24,9 +25,9 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         //noinspection IntegerDivisionInFloatingPointContext
-        camera.position.set(0, HEIGHT / 2, 10);
-        camera.zoom = 0.625f;
         renderer = new IsometricRenderer();
+        player = new PlayerShip();
+        camera.zoom = 0.625f;
     }
 
     @Override
@@ -35,12 +36,15 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.setProjectionMatrix(camera.combined);
+        camera.position.set(player.position.x, player.position.y, 0);
         camera.update();
+        player.update();
         handleInput();
 //      All rendering in libgdx is done in the sprite batch
         batch.begin();
         renderer.drawBoard(batch);
 //        renderer.drawCoordinates(batch, true);
+        player.render(batch);
         batch.end();
     }
 

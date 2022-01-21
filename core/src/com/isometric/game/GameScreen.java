@@ -25,6 +25,7 @@ public class GameScreen extends ScreenAdapter {
     Screen currentScreen = Screen.MAIN_MENU;
 
     @SuppressWarnings("FieldMayBeFinal")
+//  Screen Size
     private SpriteBatch batch, batchS;
     private OrthographicCamera camera;
     //  Screen Size
@@ -32,6 +33,7 @@ public class GameScreen extends ScreenAdapter {
     public static final int WIDTH = 320 * 5;
     public boolean MUTED = false;
     private IsometricRenderer renderer;
+    private PlayerShip player;
 
     //  Main Menu
     Rectangle play_button;
@@ -70,9 +72,9 @@ public class GameScreen extends ScreenAdapter {
         //GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         //noinspection IntegerDivisionInFloatingPointContext
-        camera.position.set(0, HEIGHT / 2, 10);
-        camera.zoom = 0.625f;
         renderer = new IsometricRenderer();
+        player = new PlayerShip();
+        camera.zoom = 0.625f;
 
 
         //MAIN MENU
@@ -112,10 +114,27 @@ public class GameScreen extends ScreenAdapter {
 
         if(currentScreen == Screen.MAIN_GAME){
 //        Delta is the time between frames
+// <<<<<<< daynyus_experimental
+//         Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
+//         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//         batch.setProjectionMatrix(camera.combined);
+//         camera.position.set(player.position.x, player.position.y, 0);
+//         camera.update();
+//         player.update();
+//         handleInput();
+// //      All rendering in libgdx is done in the sprite batch
+//         batch.begin();
+//         renderer.drawBoard(batch);
+// //        renderer.drawCoordinates(batch, true);
+
+//         batch.end();
+// =======
             Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             batch.setProjectionMatrix(camera.combined);
+            camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
+            player.update();
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
@@ -123,6 +142,7 @@ public class GameScreen extends ScreenAdapter {
 //            renderer.drawGrass(batch);
 //            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
+            player.render(batch);
             batch.end();
             batchS.begin();
             fontS.draw(batchS, ("SCORE: " + Integer.toString(score)), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight()-50);
@@ -144,13 +164,16 @@ public class GameScreen extends ScreenAdapter {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
             batch.setProjectionMatrix(camera.combined);
+            camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
+            player.update();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
             renderer.drawBoard(batch);
 //            renderer.drawGrass(batch);
 //            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
+            player.render(batch);
             batch.end();
 
             //INTERACTION WITH MENU

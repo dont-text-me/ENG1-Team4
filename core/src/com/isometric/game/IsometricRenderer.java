@@ -46,7 +46,7 @@ public class IsometricRenderer {
         for (int row = board_size; row >= 0; row--) {
             for (int col = board_size; col >= 0; col--) {
                 x = (col - row) * (small_tile_width / 2f);
-                y = ((col + row) * (small_tile_height / 4f)) - 17;
+                y = ((col + row) * (small_tile_height / 4f)) - 17 ;
                 if (drawTextCoords) {
                     coordsFont.draw(batch, ("(" + row + ", " + col + ")"), x + (small_tile_width / 2f), y + (small_tile_height / 2f));
                 }

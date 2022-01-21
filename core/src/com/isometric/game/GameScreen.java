@@ -1,18 +1,20 @@
 package com.isometric.game;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Disposable;
+
 
 public class GameScreen extends ScreenAdapter {
 
@@ -23,20 +25,29 @@ public class GameScreen extends ScreenAdapter {
     Screen currentScreen = Screen.MAIN_MENU;
 
     @SuppressWarnings("FieldMayBeFinal")
-    private SpriteBatch batch;
+    private SpriteBatch batch, batchS;
     private OrthographicCamera camera;
     //  Screen Size
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
     public boolean MUTED = false;
     private IsometricRenderer renderer;
+
     //  Main Menu
     Rectangle play_button;
     Rectangle exit_button;
     Rectangle mute_button;
-    private BitmapFont font;
+    private BitmapFont font, fontS;
     private Circle mouse_pointer;
-    private ShapeRenderer shapeRenderer;
+    private ShapeRenderer shapeRenderer, shapeRendererS;
+
+    Texture texture;
+    float totalHealth = 10;
+    float enemyDamage = 1;
+    float currentHealth = totalHealth;
+    int score = 0;
+    int gold = 0;
+
 
     public GameScreen(SpriteBatch batch){
         this.batch = batch;
@@ -63,6 +74,7 @@ public class GameScreen extends ScreenAdapter {
         camera.zoom = 0.625f;
         renderer = new IsometricRenderer();
 
+
         //MAIN MENU
         play_button = new Rectangle();
         exit_button = new Rectangle();
@@ -75,6 +87,13 @@ public class GameScreen extends ScreenAdapter {
         BackgroundMusic.setLooping(true);
         BackgroundMusic.setVolume(0.2f);
         BackgroundMusic.play();
+        shapeRendererS = new ShapeRenderer();
+        batch = new SpriteBatch();
+        batchS = new SpriteBatch();
+        fontS = new BitmapFont();
+        fontS.getData().scale(1);
+        texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
+
     }
 
     @Override
@@ -105,6 +124,20 @@ public class GameScreen extends ScreenAdapter {
 //            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
             batch.end();
+            batchS.begin();
+            fontS.draw(batchS, ("SCORE: " + Integer.toString(score)), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight()-50);
+            fontS.draw(batchS, (("X ") + Integer.toString(gold)), Gdx.graphics.getWidth() - 1480, Gdx.graphics.getHeight()-50);
+            batchS.draw(texture, Gdx.graphics.getWidth() - 1550, Gdx.graphics.getHeight()-85);;
+            batchS.end();
+            shapeRendererS.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRendererS.setColor(0, 1, 0, 1);
+            shapeRendererS.rect(Gdx.graphics.getWidth()/2 - 250, 50, (currentHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.end();
+            shapeRendererS.begin(ShapeRenderer.ShapeType.Line);
+            shapeRendererS.setColor(1, 1, 1, 1);
+            shapeRendererS.rect(Gdx.graphics.getWidth()/2 - 248, 49, (totalHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.end();
+            //
         }
         else if(currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU){
             Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
@@ -274,6 +307,8 @@ public class GameScreen extends ScreenAdapter {
                 batch.end();
             }
         }
+
+
 
     }
 

@@ -52,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
 
     //Sound
     //Background Music
-    Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
+    Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s Sea Shanties 1Hour.mp3"));
 
     @Override
     public void show() {
@@ -100,9 +100,9 @@ public class GameScreen extends ScreenAdapter {
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
-            renderer.drawBoard(batch);
-//            renderer.drawGrass(batch);
-//            renderer.drawBeach(batch);
+            renderer.drawOcean(batch);
+            renderer.drawGrass(batch);
+            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
             batch.end();
         }
@@ -114,9 +114,9 @@ public class GameScreen extends ScreenAdapter {
             camera.update();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
-            renderer.drawBoard(batch);
-//            renderer.drawGrass(batch);
-//            renderer.drawBeach(batch);
+            renderer.drawOcean(batch);
+            renderer.drawGrass(batch);
+            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
             batch.end();
 

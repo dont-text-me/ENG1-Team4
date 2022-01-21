@@ -6,14 +6,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.util.Map;
-
 public class IsometricRenderer {
 
 
 //    Todo load this from texture handler
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
+//    public final String[][] board;
     public int board_size = 0;
 
 //    These are globals
@@ -25,12 +24,14 @@ public class IsometricRenderer {
     public String map_string = handle.readString();
 //    public String[] map = map_string.split("\\r?\\n");
     public String[] map;
+    public String[][] board2d;
 
     public IsometricRenderer() {
 //      This runs once; the constructor.
         MapGenerator PirateGame = new MapGenerator();
         board_size = (PirateGame.size - 1);
         map = PirateGame.map;
+        board2d = PirateGame.board;
     }
 
     /** This is used for debug and should not be deleted.

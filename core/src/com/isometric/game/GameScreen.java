@@ -100,9 +100,9 @@ public class GameScreen extends ScreenAdapter {
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
-            renderer.drawOcean(batch);
-            renderer.drawGrass(batch);
-            renderer.drawBeach(batch);
+            renderer.drawBoard(batch);
+//            renderer.drawGrass(batch);
+//            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
             batch.end();
         }
@@ -114,9 +114,9 @@ public class GameScreen extends ScreenAdapter {
             camera.update();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
-            renderer.drawOcean(batch);
-            renderer.drawGrass(batch);
-            renderer.drawBeach(batch);
+            renderer.drawBoard(batch);
+//            renderer.drawGrass(batch);
+//            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
             batch.end();
 

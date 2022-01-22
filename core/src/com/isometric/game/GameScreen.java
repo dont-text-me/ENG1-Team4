@@ -73,8 +73,9 @@ public class GameScreen extends ScreenAdapter {
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         //noinspection IntegerDivisionInFloatingPointContext
         renderer = new IsometricRenderer();
-        player = new PlayerShip();
+        player = new PlayerShip(renderer);
         camera.zoom = 0.625f;
+
 
 
         //MAIN MENU
@@ -131,10 +132,10 @@ public class GameScreen extends ScreenAdapter {
 // =======
             Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            batch.setProjectionMatrix(camera.combined);
             camera.position.set(player.position.x, player.position.y, 0);
+            batch.setProjectionMatrix(camera.combined);
             camera.update();
-            player.update();
+            player.update(renderer);
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
@@ -166,7 +167,7 @@ public class GameScreen extends ScreenAdapter {
             batch.setProjectionMatrix(camera.combined);
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
-            player.update();
+            //player.update();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
             renderer.drawBoard(batch);
@@ -340,10 +341,10 @@ public class GameScreen extends ScreenAdapter {
 
 
     private void handleInput() {
-        //        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
-//            if (camera.zoom >= 0.35f) {camera.zoom -= 0.004f;}
-//        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
-//            if (camera.zoom <= 0.625f) {camera.zoom += 0.004f;}
+            if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
+                if (camera.zoom >= 0.35f) {camera.zoom -= 0.004f;}
+            if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
+                if (camera.zoom <= 0.625f) {camera.zoom += 0.004f;}
             if (Gdx.input.isKeyPressed(Input.Keys.UP))
                 if  (camera.position.y <= 28*64)
                 {camera.position.y += 3 + camera.zoom;}

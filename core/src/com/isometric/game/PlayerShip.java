@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.Random;
+
 public class PlayerShip implements Ship{
 
     private Texture shipImage;
@@ -14,10 +16,20 @@ public class PlayerShip implements Ship{
     public Vector2 tilePosition;
 
 
-    public PlayerShip(){
+    public PlayerShip(IsometricRenderer renderer){
         shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
-        position = new Vector2(16,32);
-        tilePosition = new Vector2(1,1);
+        tilePosition = new Vector2();
+        //Randomly setting ships' tile position
+        while (tilePosition.x == 0 && tilePosition.y == 0 ){
+            int x = new Random().nextInt(61) + 1;
+            String row = renderer.map[x];
+            int y = new Random().nextInt(61) + 1;
+            if (Character.getNumericValue(row.charAt(y)) == 9){
+                tilePosition.x = x;
+                tilePosition.y = y;
+            }
+        }
+        position = new Vector2((tilePosition.y - tilePosition.x) * 32, (tilePosition.y + tilePosition.x) * 16);
     }
 
     @Override
@@ -26,46 +38,96 @@ public class PlayerShip implements Ship{
     }
 
     @Override
-    public void update(){
-        move();
+    public void update(IsometricRenderer renderer){
+        move(renderer);
     }
-
-    private void move(){
+    //All the movement logic with the use of possibleMove method
+    private void move(IsometricRenderer renderer){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
-            shipImage = new Texture(Gdx.files.internal("ship/ship_light_Nw.png"));
             if (tilePosition.x == 62){}
-            else {
-                position.x -= 32;
-                position.y += 16;
+            else if (possibleMove(renderer, "W")){
+                shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
                 tilePosition.x += 1;
-                }
+                position.x = (tilePosition.y - tilePosition.x) * 32;
+                position.y = (tilePosition.y + tilePosition.x) * 16;
+            }
         }
+
         else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-            shipImage = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
+
             if (tilePosition.x == 1){}
-            else {
-                position.x += 32;
-                position.y -= 16;
+            else if(possibleMove(renderer, "S")){
+                shipImage = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
                 tilePosition.x -= 1;
+                position.x = (tilePosition.y - tilePosition.x) * 32;
+                position.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
+
         else if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            shipImage = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
-            if (tilePosition.y == 61){}
-            else {
-                position.x += 32;
-                position.y += 16;
+            if (tilePosition.y == 62){}
+            else if (possibleMove(renderer, "D")) {
+                shipImage = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
                 tilePosition.y += 1;
+                position.x = (tilePosition.y - tilePosition.x) * 32;
+                position.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
+
         else if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            shipImage = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
             if (tilePosition.y == 1){}
-            else {
-                position.x -= 32;
-                position.y -= 16;
+            else if (possibleMove(renderer, "A")) {
+                shipImage = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
                 tilePosition.y -= 1;
+                position.x = (tilePosition.y - tilePosition.x) * 32;
+                position.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
+    }
+    //This method checks if the next tile is water for a given move
+    public boolean possibleMove(IsometricRenderer renderer, String input) {
+        if (input == "W") {
+            int rowIndex = (int) tilePosition.x + 1;
+            int columnIndex = (int) tilePosition.y;
+            String row = renderer.map[rowIndex];
+            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
+                return false;
+            }else{
+                return true;
+            }
+        }
+        else if (input == "S"){
+            int rowIndex = (int) tilePosition.x - 1;
+            int columnIndex = (int) tilePosition.y;
+            String row = renderer.map[rowIndex];
+            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+        else if(input == "D"){
+            int rowIndex = (int) tilePosition.x;
+            int columnIndex = (int) tilePosition.y + 1;
+            String row = renderer.map[rowIndex];
+            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+        else if(input == "A"){
+            int rowIndex = (int) tilePosition.x;
+            int columnIndex = (int) tilePosition.y - 1;
+            String row = renderer.map[rowIndex];
+            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
+                return false;
+            }else{
+                return true;
+            }
+        }
+        return false;
     }
 }

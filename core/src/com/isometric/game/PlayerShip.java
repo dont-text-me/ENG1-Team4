@@ -39,7 +39,7 @@ public class PlayerShip implements Ship{
 
     private float calculateAlpha() {
         _currentTime += Gdx.graphics.getDeltaTime();
-        return 0.3f / _currentTime;
+        return 0.8f / _currentTime;
     }
 
 
@@ -50,14 +50,14 @@ public class PlayerShip implements Ship{
 
     @Override
     public void update(IsometricRenderer renderer){
-        System.out.println(position.toString() + futurePosition.toString());
+//        System.out.println(position.toString() + futurePosition.toString());
         if (position != futurePosition) {
             alpha = calculateAlpha();
             if (alpha != 1) {
                 position.lerp(futurePosition, alpha);
             }
             else {
-                System.out.println("YAY");
+//                System.out.println("YAY");
             }
         }
         move(renderer);

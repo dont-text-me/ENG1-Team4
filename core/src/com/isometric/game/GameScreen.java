@@ -14,8 +14,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import sun.jvm.hotspot.tools.SysPropsDumper;
 
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
 public class GameScreen extends ScreenAdapter {
 
     enum Screen {
@@ -50,10 +54,10 @@ public class GameScreen extends ScreenAdapter {
     int score = 0;
     int gold = 0;
 
-
-    public GameScreen(SpriteBatch batch){
-        this.batch = batch;
-    }
+    public College [] colleges;
+    public ArrayList <Projectile> balls;
+    public int whichCollege = 0;
+    Random r = new Random();
 
     //POSITION OF PLAY BUTTON
     float play_button_X = 290f;
@@ -67,11 +71,14 @@ public class GameScreen extends ScreenAdapter {
     //Background Music
     Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
 
+//    public GameScreen(SpriteBatch batch) {
+//        this.batch = batch;
+//    }
+
     @Override
     public void show() {
         //GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
-        //noinspection IntegerDivisionInFloatingPointContext
         renderer = new IsometricRenderer();
         player = new PlayerShip(renderer);
         camera.zoom = 0.625f;
@@ -96,7 +103,8 @@ public class GameScreen extends ScreenAdapter {
         fontS = new BitmapFont();
         fontS.getData().scale(1);
         texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
-
+        colleges = place_colleges(5);
+        balls = new ArrayList<Projectile>();
     }
 
     @Override
@@ -112,6 +120,15 @@ public class GameScreen extends ScreenAdapter {
                 MUTED=false;
             }
         }*/
+        handleInput();
+        balls = filter_projectiles(balls);
+        check_collisions(balls, colleges);
+        for (Projectile ball : balls) {
+            ball.update();
+        }
+        for (College c : colleges) {
+            c.update();
+        }
 
         if(currentScreen == Screen.MAIN_GAME){
 //        Delta is the time between frames
@@ -143,6 +160,14 @@ public class GameScreen extends ScreenAdapter {
 //            renderer.drawGrass(batch);
 //            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
+            for (Projectile ball : balls) {
+                if (ball.isActive()) {
+                    ball.render(batch);
+                }
+            }
+            for (College c : colleges){
+                c.render(batch);
+            }
             player.render(batch);
             batch.end();
             batchS.begin();
@@ -174,6 +199,14 @@ public class GameScreen extends ScreenAdapter {
 //            renderer.drawGrass(batch);
 //            renderer.drawBeach(batch);
 //        renderer.drawCoordinates(batch);
+            for (Projectile ball : balls) {
+                if (ball.isActive()) {
+                    ball.render(batch);
+                }
+            }
+            for (College c : colleges){
+                c.render(batch);
+            }
             player.render(batch);
             batch.end();
 
@@ -333,7 +366,35 @@ public class GameScreen extends ScreenAdapter {
         }
 
 
-
+//
+//=======
+//        Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
+//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+//        batch.setProjectionMatrix(camera.combined);
+//        camera.update();
+//        handleInput();
+//        balls = filter_projectiles(balls);
+//        check_collisions(balls, colleges);
+//        for (Projectile ball : balls) {
+//            ball.update();
+//        }
+//        for (College c : colleges) {
+//            c.update();
+//        }
+////      All rendering in libgdx is done in the sprite batch
+//        batch.begin();
+////        renderer.drawBoard(batch);
+////        for (Projectile ball : balls) {
+////            if (ball.isActive()) {
+////                ball.render(batch);
+////            }
+////        }
+////        for (College c : colleges){
+////            c.render(batch);
+////        }
+////        renderer.drawCoordinates(batch, true);
+//        batch.end();
+//>>>>>>> Stashed changes
     }
 
     @Override
@@ -341,25 +402,100 @@ public class GameScreen extends ScreenAdapter {
 
 
     private void handleInput() {
-            if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))
-                if (camera.zoom >= 0.35f) {camera.zoom -= 0.004f;}
-            if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-")))
-                if (camera.zoom <= 0.625f) {camera.zoom += 0.004f;}
-            if (Gdx.input.isKeyPressed(Input.Keys.UP))
-                if  (camera.position.y <= 28*64)
-                {camera.position.y += 3 + camera.zoom;}
-            if (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-                if (camera.position.y >= 4.5*64)
-                {camera.position.y -= 3 + camera.zoom;}
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT))
-                if (camera.position.x >= -24*64)
-                {camera.position.x -= 3 + camera.zoom;}
-            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-                if (camera.position.x <= 25*64)
-                {camera.position.x += 3 + camera.zoom;}
-//        System.out.println(camera.zoom);
-//        System.out.println(camera.position.x + ", " + camera.position.y);
-            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE))
-                currentScreen = Screen.PAUSE_MENU;
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            currentScreen = Screen.PAUSE_MENU;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {camera.position.y += 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {camera.position.y -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {camera.position.x -= 3 + camera.zoom;}
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {camera.position.x += 3 + camera.zoom;}
+        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                balls.add(colleges[whichCollege].shoot(new Vector2(63, 63)));
+                whichCollege += 1;
+                if (whichCollege == colleges.length){
+                    whichCollege = 0;
+                }
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+            for (College c : colleges){
+                c.setHealth(100);
+            }
+        }
+/*
+        Todo: set boundaries on the map (later in development)
+        System.out.println(camera.zoom);
+        System.out.println(camera.position.x + ", " + camera.position.y);
+*/
+    }
+/**
+ * Returns an array of colleges of specified length.
+ * Colleges are placed on islands with 1 patch of grass surrounded by beach
+ * @param num the desired number of colleges
+ * @return the array containing College objects, placed on islands on the game map
+ * */
+    public College [] place_colleges(int num){
+        College [] colleges = new College[num];
+        Vector2[] college_locations = new Vector2[num];
+        for (int i = 0; i < num; i ++){
+            for (int x = renderer.board_size; x > 0; x --){
+                for (int y = renderer.board_size; y > 0; y --){
+                    if (
+                            renderer.map[x].charAt(y) == '0' &&
+                            renderer.map[x].charAt(y - 1) == '1' &&
+                            renderer.map[x].charAt(y + 1) == '3' &&
+                            renderer.map[x - 1].charAt(y) == '2' &&
+                                    renderer.map[x + 1].charAt(y) == '4'
+                    ){
+                        Vector2 pos = new Vector2 (y, x);
+                        if (!(Arrays.asList(college_locations).contains(pos))){
+                            college_locations[i] = pos;
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < num; i ++){
+            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y, 0);
+        }
+        return colleges;
+    }
+
+    /**
+     * Checks whether any of the projectiles entered a tile where a college is located.
+     * If a projectile intersects with a college that is still not defeated, the college takes damage and the projectie
+     * gets deactivated. Otherwise, the projectile continues to travel straignt through the college.
+     * @param balls ArrayList of Projectile objects
+     * @param colleges Array of College objects
+     * */
+    public void check_collisions(ArrayList<Projectile> balls, College [] colleges){
+        for (int i = 0; i < balls.size(); i++) {
+                for (int j = 0; j < colleges.length; j++) {
+                    if (colleges[j].getTilePosition().epsilonEquals(balls.get(i).nearestTile())) {
+                        if (balls.get(i).isByPlayer()) {
+                            colleges[j].takeDamage(20);
+                        }
+                        if (colleges[j].isDefeated()) {
+                            balls.get(i).deactivate(); // if college is defeated, projectiles will travel through.
+                        }
+                    }
+                }
+        }
+    }
+    /**
+     * Iterates over projectile list and removes deactivated ones.
+     * @param balls ArrayList of projectiles, before filtering
+     * @return ArrayList of projectiles, filtered.
+     * */
+    public ArrayList <Projectile> filter_projectiles(ArrayList<Projectile> balls){
+        ArrayList <Projectile> output = new ArrayList<Projectile>();
+        for (Projectile ball : balls){
+            if (ball.isActive()){
+                output.add(ball);
+            }
+        }
+        return output;
     }
 }
+

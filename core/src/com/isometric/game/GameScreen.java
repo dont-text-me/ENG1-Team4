@@ -167,7 +167,7 @@ public class GameScreen extends ScreenAdapter {
             batch.setProjectionMatrix(camera.combined);
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
-            //player.update();
+//            player.update(renderer);
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
             renderer.drawBoard(batch);

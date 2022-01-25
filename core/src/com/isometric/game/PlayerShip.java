@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
+import javax.swing.plaf.IconUIResource;
 import java.util.Random;
 
 public class PlayerShip implements Ship{
@@ -14,6 +15,9 @@ public class PlayerShip implements Ship{
     private Texture shipImage;
     public Vector2 position;
     public Vector2 tilePosition;
+    public Vector2 futurePosition;
+    private float _currentTime;
+    private float alpha;
 
 
     public PlayerShip(IsometricRenderer renderer){
@@ -30,7 +34,14 @@ public class PlayerShip implements Ship{
             }
         }
         position = new Vector2((tilePosition.y - tilePosition.x) * 32, (tilePosition.y + tilePosition.x) * 16);
+        futurePosition = new Vector2(position.x, position.y);
     }
+
+    private float calculateAlpha() {
+        _currentTime += Gdx.graphics.getDeltaTime();
+        return 0.3f / _currentTime;
+    }
+
 
     @Override
     public void render(SpriteBatch batch) {
@@ -39,6 +50,16 @@ public class PlayerShip implements Ship{
 
     @Override
     public void update(IsometricRenderer renderer){
+        System.out.println(position.toString() + futurePosition.toString());
+        if (position != futurePosition) {
+            alpha = calculateAlpha();
+            if (alpha != 1) {
+                position.lerp(futurePosition, alpha);
+            }
+            else {
+                System.out.println("YAY");
+            }
+        }
         move(renderer);
     }
     //All the movement logic with the use of possibleMove method
@@ -48,8 +69,8 @@ public class PlayerShip implements Ship{
             else if (possibleMove(renderer, "W")){
                 shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
                 tilePosition.x += 1;
-                position.x = (tilePosition.y - tilePosition.x) * 32;
-                position.y = (tilePosition.y + tilePosition.x) * 16;
+                futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
+                futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
 
@@ -59,8 +80,8 @@ public class PlayerShip implements Ship{
             else if(possibleMove(renderer, "S")){
                 shipImage = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
                 tilePosition.x -= 1;
-                position.x = (tilePosition.y - tilePosition.x) * 32;
-                position.y = (tilePosition.y + tilePosition.x) * 16;
+                futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
+                futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
 
@@ -69,8 +90,8 @@ public class PlayerShip implements Ship{
             else if (possibleMove(renderer, "D")) {
                 shipImage = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
                 tilePosition.y += 1;
-                position.x = (tilePosition.y - tilePosition.x) * 32;
-                position.y = (tilePosition.y + tilePosition.x) * 16;
+                futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
+                futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
 
@@ -79,8 +100,8 @@ public class PlayerShip implements Ship{
             else if (possibleMove(renderer, "A")) {
                 shipImage = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
                 tilePosition.y -= 1;
-                position.x = (tilePosition.y - tilePosition.x) * 32;
-                position.y = (tilePosition.y + tilePosition.x) * 16;
+                futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
+                futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
     }

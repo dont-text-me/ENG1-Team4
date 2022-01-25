@@ -23,6 +23,7 @@ public class Projectile {
                 ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f)) - 17
         );
         delta = new Vector2(delta_x, delta_y);
+        System.out.println(delta.toString());
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
         sprite = new Texture(Gdx.files.internal("cannon_ball/cannonBall_NE.png"));
         byPlayer = player;
@@ -45,10 +46,8 @@ public class Projectile {
         else{
             tilePosition = tilePosition.add(delta);
             // converting tile position to screen position:
-            position = new Vector2(
-                    (tilePosition.x - tilePosition.y) * (small_tile_width / 2f),
-                    ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f)) - 17
-            );
+            position.x = (tilePosition.x - tilePosition.y) * (small_tile_width / 2f);
+            position.y = (tilePosition.x + tilePosition.y) * (small_tile_height / 4f) - 17;
             lifetime -= 1;
         }
     }

@@ -98,8 +98,8 @@ public class College {
         return new Projectile (
                 tilePosition.x + 2, // to make the projectile start off from the top of the tower visually
                 tilePosition.y + 2, // see above
-                pos.x - tilePosition.x, // the difference in x coordinates between tower position and target
-                pos.y - tilePosition.y, // see above, magnitude of the difference doesnt matter as vector is normalised in Projectile class
+                pos.y - tilePosition.x,
+                pos.x - tilePosition.y,
                 false // needed so that buildings do not hurt each other
         );
     }

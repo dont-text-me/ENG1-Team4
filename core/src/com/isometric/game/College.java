@@ -1,0 +1,106 @@
+package com.isometric.game;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+
+
+public class College {
+    public static final int small_tile_width = 64;
+    public static final int small_tile_height = 64;
+    private final Texture sprite;
+    private final Vector2 position;
+    private final Vector2 tilePosition;
+    private boolean isDefeated = false;
+    private int health = 100;
+    public College (int x, int y, int sprite_type) {
+        tilePosition = new Vector2(x, y);
+        // converting tile position to screen position:
+        float pos_x;
+        float pos_y;
+        pos_x = (x - y) * (small_tile_width / 2f);
+        pos_y = ((x + y) * (small_tile_height / 4f)) - 17;
+        position = new Vector2(pos_x, pos_y);
+        //----------------------------------------------
+        sprite = new Texture(Gdx.files.internal("college_building/tower_NE.png"));
+    }
+
+
+    /**
+     * Renders the college and its healthbar. If college is defeated, renders the college and a white flag.
+     * */
+    public void render(SpriteBatch batch){
+        if (health == 100){
+            batch.draw(
+                    new Texture(Gdx.files.internal("healthbar_components/green.png")),
+                    position.x - (small_tile_width / 4),
+                    position.y + (small_tile_height) + 5,
+                    100,
+                    3.0f
+            );
+        }
+        else if ((health < 100) && (health > 0)) {
+            batch.draw(
+                    new Texture(Gdx.files.internal("healthbar_components/green.png")),
+                    position.x - (small_tile_width / 4),
+                    position.y + (small_tile_height) + 5,
+                    health,
+                    3.0f
+            ); // drawing out the green part of the health bar
+            batch.draw(
+                    new Texture(Gdx.files.internal("healthbar_components/red.png")),
+                    position.x - (small_tile_width / 4) + health, // red part is rendered immediately to the right of the green part
+                    position.y + (small_tile_height) + 5,
+                    100 - health,
+                    3.0f
+            ); // drawing out the red part of the health bar
+        }
+        else{
+            batch.draw(
+                    new Texture (Gdx.files.internal("white_flag/white_flag.png")),
+                    position.x + (small_tile_width / 2),
+                    position.y + small_tile_height); // drawing out the white flag for defeated colleges
+        }
+        batch.draw(sprite, position.x, position.y);
+    }
+
+    public void update(){
+        if (health <= 0){
+            isDefeated = true;
+        }
+    }
+
+    public void takeDamage(int dmg){
+        if (health > 0) {
+            health = health - dmg;
+        }
+    }
+
+    public Vector2 getTilePosition(){
+        return tilePosition;
+    }
+    //for testing, TODO remove this
+    public void setHealth(int num){
+        health = num;
+    }
+
+    public boolean isDefeated(){
+        return isDefeated;
+    }
+
+    /**
+     * Returns a projectile aimed in the direction of the input vector.
+     * @param pos Specifies the target of the projectile
+     * @return The newly created projectile
+     * */
+    public Projectile shoot (Vector2 pos){
+        return new Projectile (
+                tilePosition.x + 2, // to make the projectile start off from the top of the tower visually
+                tilePosition.y + 2, // see above
+                pos.x - tilePosition.x, // the difference in x coordinates between tower position and target
+                pos.y - tilePosition.y, // see above, magnitude of the difference doesnt matter as vector is normalised in Projectile class
+                false // needed so that buildings do not hurt each other
+        );
+    }
+}

@@ -15,11 +15,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import sun.jvm.hotspot.tools.SysPropsDumper;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 public class GameScreen extends ScreenAdapter {
 
     enum Screen {
@@ -28,11 +28,11 @@ public class GameScreen extends ScreenAdapter {
 
     Screen currentScreen = Screen.MAIN_MENU;
 
-    @SuppressWarnings("FieldMayBeFinal")
 //  Screen Size
     private SpriteBatch batch, batchS;
     private OrthographicCamera camera;
-    //  Screen Size
+    private ExtendViewport viewport;
+
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
     public boolean MUTED = false;
@@ -57,7 +57,6 @@ public class GameScreen extends ScreenAdapter {
     public College [] colleges;
     public ArrayList <Projectile> balls;
     public int whichCollege = 0;
-    Random r = new Random();
 
     //POSITION OF PLAY BUTTON
     float play_button_X = 290f;
@@ -67,23 +66,18 @@ public class GameScreen extends ScreenAdapter {
     float exit_button_X = 290f;
     float exit_button_Y = 260f;
 
-    //Sound
     //Background Music
     Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
-
-//    public GameScreen(SpriteBatch batch) {
-//        this.batch = batch;
-//    }
 
     @Override
     public void show() {
         //GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
+        viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
+        viewport.apply();
         renderer = new IsometricRenderer();
         player = new PlayerShip(renderer);
         camera.zoom = 0.625f;
-
-
 
         //MAIN MENU
         play_button = new Rectangle();
@@ -104,22 +98,43 @@ public class GameScreen extends ScreenAdapter {
         fontS.getData().scale(1);
         texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
         colleges = place_colleges(5);
-        balls = new ArrayList<Projectile>();
+        balls = new ArrayList<>();
+    }
+
+    private void batchRender() {
+        batch.begin();
+        renderer.drawBoard(batch);
+        for (Projectile ball : balls) {
+            if (ball.isActive()) {
+                ball.render(batch);
+            }
+        }
+        for (College c : colleges){
+            c.render(batch);
+        }
+        player.render(batch);
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width, height);
+        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
     }
 
     @Override
     public void render(float delta) {
-
-        //MUTE MUSIC
-/*        if(Gdx.input.isKeyPressed(Input.Keys.M)){
-            if(MUTED==false){
+        if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
+            if(!MUTED){
                 BackgroundMusic.setVolume(0f);
                 MUTED=true;
-            } else if(MUTED){
+            } else {
                 BackgroundMusic.setVolume(0.2f);
                 MUTED=false;
             }
-        }*/
+        }
+
+//        Updates for calculating ball travel vectors.
         handleInput();
         balls = filter_projectiles(balls);
         check_collisions(balls, colleges);
@@ -131,22 +146,6 @@ public class GameScreen extends ScreenAdapter {
         }
 
         if(currentScreen == Screen.MAIN_GAME){
-//        Delta is the time between frames
-// <<<<<<< daynyus_experimental
-//         Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
-//         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//         batch.setProjectionMatrix(camera.combined);
-//         camera.position.set(player.position.x, player.position.y, 0);
-//         camera.update();
-//         player.update();
-//         handleInput();
-// //      All rendering in libgdx is done in the sprite batch
-//         batch.begin();
-//         renderer.drawBoard(batch);
-// //        renderer.drawCoordinates(batch, true);
-
-//         batch.end();
-// =======
             Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
             camera.position.set(player.position.x, player.position.y, 0);
@@ -155,33 +154,19 @@ public class GameScreen extends ScreenAdapter {
             player.update(renderer);
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
-            batch.begin();
-            renderer.drawBoard(batch);
-//            renderer.drawGrass(batch);
-//            renderer.drawBeach(batch);
-//        renderer.drawCoordinates(batch);
-            for (Projectile ball : balls) {
-                if (ball.isActive()) {
-                    ball.render(batch);
-                }
-            }
-            for (College c : colleges){
-                c.render(batch);
-            }
-            player.render(batch);
-            batch.end();
+            batchRender();
             batchS.begin();
-            fontS.draw(batchS, ("SCORE: " + Integer.toString(score)), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight()-50);
-            fontS.draw(batchS, (("X ") + Integer.toString(gold)), Gdx.graphics.getWidth() - 1480, Gdx.graphics.getHeight()-50);
-            batchS.draw(texture, Gdx.graphics.getWidth() - 1550, Gdx.graphics.getHeight()-85);;
+            fontS.draw(batchS, ("SCORE: " + score), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight()-50);
+            fontS.draw(batchS, (("X ") + gold), Gdx.graphics.getWidth() - 1480, Gdx.graphics.getHeight()-50);
+            batchS.draw(texture, Gdx.graphics.getWidth() - 1550, Gdx.graphics.getHeight()-85);
             batchS.end();
             shapeRendererS.begin(ShapeRenderer.ShapeType.Filled);
             shapeRendererS.setColor(0, 1, 0, 1);
-            shapeRendererS.rect(Gdx.graphics.getWidth()/2 - 250, 50, (currentHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.rect(Gdx.graphics.getWidth()/2f - 250, 50, (currentHealth * 50), 20); //draw health bar rectangle
             shapeRendererS.end();
             shapeRendererS.begin(ShapeRenderer.ShapeType.Line);
             shapeRendererS.setColor(1, 1, 1, 1);
-            shapeRendererS.rect(Gdx.graphics.getWidth()/2 - 248, 49, (totalHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.rect(Gdx.graphics.getWidth()/2f - 248, 49, (totalHealth * 50), 20); //draw health bar rectangle
             shapeRendererS.end();
             //
         }
@@ -194,21 +179,7 @@ public class GameScreen extends ScreenAdapter {
             camera.update();
 //            player.update(renderer);
 //      All rendering in libgdx is done in the sprite batch
-            batch.begin();
-            renderer.drawBoard(batch);
-//            renderer.drawGrass(batch);
-//            renderer.drawBeach(batch);
-//        renderer.drawCoordinates(batch);
-            for (Projectile ball : balls) {
-                if (ball.isActive()) {
-                    ball.render(batch);
-                }
-            }
-            for (College c : colleges){
-                c.render(batch);
-            }
-            player.render(batch);
-            batch.end();
+            batchRender();
 
             //INTERACTION WITH MENU
             //IF PLAYER CLICKS ON THE PLAY BUTTON AND EXIT BUTTON. INPUT ADAPTER CLASS CHECKS IF USER PRESSED MOUSE PAD OR KEYBOARD BUTTON
@@ -223,10 +194,10 @@ public class GameScreen extends ScreenAdapter {
                             Gdx.app.exit(); //EXIT THE GAME
                         }
                         else if(mute_button.contains(mouse_pointer.x, mouse_pointer.y)) {
-                            if(MUTED == false) {
+                            if(!MUTED) {
                                 BackgroundMusic.setVolume(0f);
                                 MUTED=true;
-                            } else if(MUTED){
+                            } else {
                                 BackgroundMusic.setVolume(0.2f);
                                 MUTED=false;
                             }
@@ -258,7 +229,7 @@ public class GameScreen extends ScreenAdapter {
 
             //HOVERING EFFECT OF MOUSE POINTER AND MUTE BUTTON
             if(mute_button.contains(mouse_pointer.x, mouse_pointer.y)) {
-                if (MUTED == false) {
+                if (!MUTED) {
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     shapeRenderer.setColor(Color.GRAY);
                     shapeRenderer.triangle(1550, 880, 1510, 860, 1550, 840);
@@ -279,7 +250,7 @@ public class GameScreen extends ScreenAdapter {
                     shapeRenderer.end();
                 }
             } else {
-                if(MUTED==false){
+                if(!MUTED){
                     shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                     shapeRenderer.setColor(Color.DARK_GRAY);
                     shapeRenderer.triangle(1550, 880, 1510, 860, 1550, 840);
@@ -364,37 +335,6 @@ public class GameScreen extends ScreenAdapter {
                 batch.end();
             }
         }
-
-
-//
-//=======
-//        Gdx.gl.glClearColor(44f/255,97f/255,129f/255,1);
-//        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-//        batch.setProjectionMatrix(camera.combined);
-//        camera.update();
-//        handleInput();
-//        balls = filter_projectiles(balls);
-//        check_collisions(balls, colleges);
-//        for (Projectile ball : balls) {
-//            ball.update();
-//        }
-//        for (College c : colleges) {
-//            c.update();
-//        }
-////      All rendering in libgdx is done in the sprite batch
-//        batch.begin();
-////        renderer.drawBoard(batch);
-////        for (Projectile ball : balls) {
-////            if (ball.isActive()) {
-////                ball.render(batch);
-////            }
-////        }
-////        for (College c : colleges){
-////            c.render(batch);
-////        }
-////        renderer.drawCoordinates(batch, true);
-//        batch.end();
-//>>>>>>> Stashed changes
     }
 
     @Override
@@ -407,11 +347,7 @@ public class GameScreen extends ScreenAdapter {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {camera.position.y += 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {camera.position.y -= 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {camera.position.x -= 3 + camera.zoom;}
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {camera.position.x += 3 + camera.zoom;}
-        if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                 balls.add(colleges[whichCollege].shoot(new Vector2(63, 63)));
                 whichCollege += 1;
                 if (whichCollege == colleges.length){
@@ -423,11 +359,6 @@ public class GameScreen extends ScreenAdapter {
                 c.setHealth(100);
             }
         }
-/*
-        Todo: set boundaries on the map (later in development)
-        System.out.println(camera.zoom);
-        System.out.println(camera.position.x + ", " + camera.position.y);
-*/
     }
 /**
  * Returns an array of colleges of specified length.
@@ -439,16 +370,16 @@ public class GameScreen extends ScreenAdapter {
         College [] colleges = new College[num];
         Vector2[] college_locations = new Vector2[num];
         for (int i = 0; i < num; i ++){
-            for (int x = renderer.board_size; x > 0; x --){
-                for (int y = renderer.board_size; y > 0; y --){
+            for (int y = renderer.board_size; y > 0; y --){
+                for (int x = renderer.board_size; x > 0; x --){
                     if (
-                            renderer.map[x].charAt(y) == '0' &&
-                            renderer.map[x].charAt(y - 1) == '1' &&
-                            renderer.map[x].charAt(y + 1) == '3' &&
-                            renderer.map[x - 1].charAt(y) == '2' &&
-                                    renderer.map[x + 1].charAt(y) == '4'
+                            renderer.map[y].charAt(x) == '0' &&
+                            renderer.map[y].charAt(x - 1) == '1' &&
+                            renderer.map[y].charAt(x + 1) == '3' &&
+                            renderer.map[y - 1].charAt(x) == '2'
+//                            renderer.map[y + 1].charAt(x) == '4'
                     ){
-                        Vector2 pos = new Vector2 (y, x);
+                        Vector2 pos = new Vector2 (x, y);
                         if (!(Arrays.asList(college_locations).contains(pos))){
                             college_locations[i] = pos;
                         }
@@ -470,17 +401,17 @@ public class GameScreen extends ScreenAdapter {
      * @param colleges Array of College objects
      * */
     public void check_collisions(ArrayList<Projectile> balls, College [] colleges){
-        for (int i = 0; i < balls.size(); i++) {
-                for (int j = 0; j < colleges.length; j++) {
-                    if (colleges[j].getTilePosition().epsilonEquals(balls.get(i).nearestTile())) {
-                        if (balls.get(i).isByPlayer()) {
-                            colleges[j].takeDamage(20);
-                        }
-                        if (colleges[j].isDefeated()) {
-                            balls.get(i).deactivate(); // if college is defeated, projectiles will travel through.
-                        }
+        for (Projectile ball : balls) {
+            for (College college : colleges) {
+                if (college.getTilePosition().epsilonEquals(ball.nearestTile())) {
+                    if (ball.isByPlayer()) {
+                        college.takeDamage(20);
+                    }
+                    if (college.isDefeated()) {
+                        ball.deactivate(); // if college is defeated, projectiles will travel through.
                     }
                 }
+            }
         }
     }
     /**
@@ -489,7 +420,7 @@ public class GameScreen extends ScreenAdapter {
      * @return ArrayList of projectiles, filtered.
      * */
     public ArrayList <Projectile> filter_projectiles(ArrayList<Projectile> balls){
-        ArrayList <Projectile> output = new ArrayList<Projectile>();
+        ArrayList <Projectile> output = new ArrayList<>();
         for (Projectile ball : balls){
             if (ball.isActive()){
                 output.add(ball);

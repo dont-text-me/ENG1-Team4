@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+
 public class Projectile {
     private final Texture sprite;
-    private Vector2 position;
+    private final Vector2 position;
     private Vector2 tilePosition;
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
@@ -23,7 +24,7 @@ public class Projectile {
                 ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f)) - 17
         );
         delta = new Vector2(delta_x, delta_y);
-        System.out.println(delta.toString());
+//        System.out.println(delta);
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
         sprite = new Texture(Gdx.files.internal("cannon_ball/cannonBall_NE.png"));
         byPlayer = player;

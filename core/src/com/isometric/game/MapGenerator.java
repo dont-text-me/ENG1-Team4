@@ -40,9 +40,6 @@ public class MapGenerator {
                 y += (spawn.nextInt(2)-1);
                 board[x][y] = "0";
                 chance += growthWeight;
-//                System.out.println(chance);
-//                System.out.println(temp);
-//                System.out.println(String.valueOf(x)+String.valueOf(y));
                 temp = probability.nextDouble();
             }
         }
@@ -101,7 +98,7 @@ public class MapGenerator {
                         }
                     }
 
-                    //                straight left
+//                    straight left
                     if (board[y][x - 1].equals("9")) {
                         if ((board[y - 1][x - 1].equals("9")) || (board[y - 1][x - 1].equals("1"))) {
                             if ((board[y + 1][x - 1].equals("9")) || (board[y + 1][x - 1].equals("1"))) {
@@ -112,7 +109,7 @@ public class MapGenerator {
                         }
                     }
 
-                    //                straight right
+//                    straight right
                     if (board[y][x + 1].equals("9")) {
                         if ((board[y - 1][x + 1].equals("9")) || (board[y - 1][x + 1].equals("3"))) {
                             if ((board[y + 1][x + 1].equals("9")) || (board[y + 1][x + 1].equals("3"))) {
@@ -123,7 +120,7 @@ public class MapGenerator {
                         }
                     }
 
-                    //                straight top
+//                    straight top
                     if (board[y - 1][x].equals("9")) {
                         if ((board[y - 1][x - 1].equals("9")) || (board[y - 1][x - 1].equals("2"))) {
                             if ((board[y - 1][x + 1].equals("9")) || (board[y - 1][x + 1].equals("2"))) {
@@ -224,12 +221,6 @@ public class MapGenerator {
             }
         }
 
-
-
-        String out = Arrays.deepToString(board);
-        for (String[] row: board) {
-            System.out.println(Arrays.toString(row));
-        }
         StringBuilder output = new StringBuilder();
         int counter = 0;
         for (String[] row:board) {

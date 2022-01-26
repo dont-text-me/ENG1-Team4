@@ -34,7 +34,7 @@ public class College {
         if (health == 100){
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/green.png")),
-                    position.x - (small_tile_width / 4),
+                    position.x - (small_tile_width / 4f),
                     position.y + (small_tile_height) + 5,
                     100,
                     3.0f
@@ -43,14 +43,14 @@ public class College {
         else if ((health < 100) && (health > 0)) {
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/green.png")),
-                    position.x - (small_tile_width / 4),
+                    position.x - (small_tile_width / 4f),
                     position.y + (small_tile_height) + 5,
                     health,
                     3.0f
             ); // drawing out the green part of the health bar
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/red.png")),
-                    position.x - (small_tile_width / 4) + health, // red part is rendered immediately to the right of the green part
+                    position.x - (small_tile_width / 4f) + health, // red part is rendered immediately to the right of the green part
                     position.y + (small_tile_height) + 5,
                     100 - health,
                     3.0f
@@ -59,7 +59,7 @@ public class College {
         else{
             batch.draw(
                     new Texture (Gdx.files.internal("white_flag/white_flag.png")),
-                    position.x + (small_tile_width / 2),
+                    position.x + (small_tile_width / 2f),
                     position.y + small_tile_height); // drawing out the white flag for defeated colleges
         }
         batch.draw(sprite, position.x, position.y);

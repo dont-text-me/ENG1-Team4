@@ -2,26 +2,34 @@ package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
-import javax.swing.plaf.IconUIResource;
 import java.util.Random;
 
-public class PlayerShip implements Ship{
+public class PlayerShip{
 
-    private Texture shipImage;
+    private final Texture[] shipImage = new Texture[16];
+    private int currentDirection = 0;
     public Vector2 position;
     public Vector2 tilePosition;
     public Vector2 futurePosition;
     private float _currentTime;
+    @SuppressWarnings("FieldCanBeLocal")
     private float alpha;
 
 
+
     public PlayerShip(IsometricRenderer renderer){
-        shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
+//        shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
+        shipImage[0] = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
+        shipImage[1] = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
+        shipImage[2] = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
+        shipImage[3] = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
+
+
         tilePosition = new Vector2();
         //Randomly setting ships' tile position
         while (tilePosition.x == 0 && tilePosition.y == 0 ){
@@ -39,35 +47,32 @@ public class PlayerShip implements Ship{
 
     private float calculateAlpha() {
         _currentTime += Gdx.graphics.getDeltaTime();
-        return 0.8f / _currentTime;
+        return 0.6f / _currentTime;
     }
 
 
-    @Override
     public void render(SpriteBatch batch) {
-        batch.draw(shipImage, position.x, position.y);
+        batch.draw(shipImage[currentDirection], position.x, position.y);
     }
 
-    @Override
+
     public void update(IsometricRenderer renderer){
-//        System.out.println(position.toString() + futurePosition.toString());
         if (position != futurePosition) {
-            alpha = calculateAlpha();
-            if (alpha != 1) {
-                position.lerp(futurePosition, alpha);
+//            alpha = calculateAlpha();
+//            if (alpha != 1) {
+                position.lerp(futurePosition, 0.1f);
             }
-            else {
-//                System.out.println("YAY");
-            }
-        }
         move(renderer);
     }
-    //All the movement logic with the use of possibleMove method
+//    All the movement logic with the use of possibleMove method
     private void move(IsometricRenderer renderer){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
-            if (tilePosition.x == 62){}
+            if (tilePosition.x == 62){
+//                do nothing
+                assert true;
+            }
             else if (possibleMove(renderer, "W")){
-                shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
+                currentDirection = 0;
                 tilePosition.x += 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
                 futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
@@ -76,9 +81,12 @@ public class PlayerShip implements Ship{
 
         else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
 
-            if (tilePosition.x == 1){}
+            if (tilePosition.x == 1){
+//                do nothing
+                assert true;
+            }
             else if(possibleMove(renderer, "S")){
-                shipImage = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
+                currentDirection = 1;
                 tilePosition.x -= 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
                 futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
@@ -86,9 +94,12 @@ public class PlayerShip implements Ship{
         }
 
         else if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            if (tilePosition.y == 62){}
+            if (tilePosition.y == 62){
+//                do nothing
+                assert true;
+            }
             else if (possibleMove(renderer, "D")) {
-                shipImage = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
+                currentDirection = 2;
                 tilePosition.y += 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
                 futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
@@ -96,57 +107,44 @@ public class PlayerShip implements Ship{
         }
 
         else if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            if (tilePosition.y == 1){}
+            if (tilePosition.y == 1){
+//                do nothing
+                assert true;
+            }
             else if (possibleMove(renderer, "A")) {
-                shipImage = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
+                currentDirection = 3;
                 tilePosition.y -= 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
                 futurePosition.y = (tilePosition.y + tilePosition.x) * 16;
             }
         }
     }
-    //This method checks if the next tile is water for a given move
+//    This method checks if the next tile is water for a given move
     public boolean possibleMove(IsometricRenderer renderer, String input) {
-        if (input == "W") {
-            int rowIndex = (int) tilePosition.x + 1;
-            int columnIndex = (int) tilePosition.y;
-            String row = renderer.map[rowIndex];
-            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
-                return false;
-            }else{
-                return true;
+        switch (input) {
+            case "W": {
+                int rowIndex = (int) tilePosition.x + 1;
+                int columnIndex = (int) tilePosition.y;
+                String row = renderer.map[rowIndex];
+                return Character.getNumericValue(row.charAt(columnIndex)) == 9;
             }
-        }
-        else if (input == "S"){
-            int rowIndex = (int) tilePosition.x - 1;
-            int columnIndex = (int) tilePosition.y;
-            String row = renderer.map[rowIndex];
-            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
-                return false;
-            }else{
-                return true;
+            case "S": {
+                int rowIndex = (int) tilePosition.x - 1;
+                int columnIndex = (int) tilePosition.y;
+                String row = renderer.map[rowIndex];
+                return Character.getNumericValue(row.charAt(columnIndex)) == 9;
             }
-        }
-
-        else if(input == "D"){
-            int rowIndex = (int) tilePosition.x;
-            int columnIndex = (int) tilePosition.y + 1;
-            String row = renderer.map[rowIndex];
-            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
-                return false;
-            }else{
-                return true;
+            case "D": {
+                int rowIndex = (int) tilePosition.x;
+                int columnIndex = (int) tilePosition.y + 1;
+                String row = renderer.map[rowIndex];
+                return Character.getNumericValue(row.charAt(columnIndex)) == 9;
             }
-        }
-
-        else if(input == "A"){
-            int rowIndex = (int) tilePosition.x;
-            int columnIndex = (int) tilePosition.y - 1;
-            String row = renderer.map[rowIndex];
-            if (Character.getNumericValue(row.charAt(columnIndex)) != 9) {
-                return false;
-            }else{
-                return true;
+            case "A": {
+                int rowIndex = (int) tilePosition.x;
+                int columnIndex = (int) tilePosition.y - 1;
+                String row = renderer.map[rowIndex];
+                return Character.getNumericValue(row.charAt(columnIndex)) == 9;
             }
         }
         return false;

@@ -14,7 +14,9 @@ public class College {
     private final Vector2 tilePosition;
     private boolean isDefeated = false;
     private int health = 100;
-    public College (int x, int y, int sprite_type) {
+    private int reloadTime; // prevents the college from continuously firing at the player when they are in range
+    private boolean firing; // true when the college will shoot in a particular frame
+    public College (int x, int y) {
         tilePosition = new Vector2(x, y);
         // converting tile position to screen position:
         float pos_x;
@@ -24,6 +26,8 @@ public class College {
         position = new Vector2(pos_x, pos_y);
         //----------------------------------------------
         sprite = new Texture(Gdx.files.internal("college_building/tower_NE.png"));
+        reloadTime = 60; // will fire every 30 frames, change as needed
+        firing = false;
     }
 
 
@@ -65,10 +69,30 @@ public class College {
         batch.draw(sprite, position.x, position.y);
     }
 
-    public void update(){
+    public void update(PlayerShip p){
         if (health <= 0){
             isDefeated = true;
+            firing = false;
         }
+        else{
+            if (p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100){
+                if (reloadTime == 0){
+                    reloadTime = 30;
+                    firing = true;
+                }
+                else{
+                    reloadTime -= 1;
+                    firing = false;
+                }
+            }
+            else{
+                reloadTime = 60; // if player approaches college, will fire after 1 frame
+            }
+        }
+    }
+
+    public boolean isFiring(){
+        return firing;
     }
 
     public void takeDamage(int dmg){
@@ -98,8 +122,8 @@ public class College {
         return new Projectile (
                 tilePosition.x + 2, // to make the projectile start off from the top of the tower visually
                 tilePosition.y + 2, // see above
-                pos.y - tilePosition.x,
-                pos.x - tilePosition.y,
+                pos.y - tilePosition.x - 0.5f, // to make the projectile aim at the center of the ship
+                pos.x - tilePosition.y - 0.5f, // see above
                 false // needed so that buildings do not hurt each other
         );
     }

@@ -24,7 +24,6 @@ public class Projectile {
                 ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f)) - 17
         );
         delta = new Vector2(delta_x, delta_y);
-//        System.out.println(delta);
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
         sprite = new Texture(Gdx.files.internal("cannon_ball/cannonBall_NE.png"));
         byPlayer = player;

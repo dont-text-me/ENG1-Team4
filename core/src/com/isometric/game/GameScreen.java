@@ -234,14 +234,6 @@ public class GameScreen extends ScreenAdapter {
 
 //        Updates for calculating ball travel vectors.
         handleInput();
-        balls = filter_projectiles(balls);
-        check_collisions(balls, colleges);
-        for (Projectile ball : balls) {
-            ball.update();
-        }
-        for (College c : colleges) {
-            c.update();
-        }
 
         if (currentScreen == Screen.MAIN_GAME) {
             Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
@@ -255,6 +247,17 @@ public class GameScreen extends ScreenAdapter {
                 enemyShip.update(renderer);
             }
 
+            balls = filter_projectiles(balls);
+            check_collisions(balls, colleges);
+            for (Projectile ball : balls) {
+                ball.update();
+            }
+            for (College c : colleges) {
+                c.update(player);
+                if (c.isFiring()){
+                    balls.add(c.shoot(player.tilePosition));
+                }
+            }
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batchRender();
@@ -307,13 +310,6 @@ public class GameScreen extends ScreenAdapter {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                balls.add(colleges[whichCollege].shoot(new Vector2(63, 63)));
-                whichCollege += 1;
-                if (whichCollege == colleges.length){
-                    whichCollege = 0;
-                }
-        }
         if (Gdx.input.isKeyPressed(Input.Keys.R)) {
             for (College c : colleges){
                 c.setHealth(100);
@@ -337,7 +333,6 @@ public class GameScreen extends ScreenAdapter {
                             renderer.map[y].charAt(x - 1) == '1' &&
                             renderer.map[y].charAt(x + 1) == '3' &&
                             renderer.map[y - 1].charAt(x) == '2'
-//                            renderer.map[y + 1].charAt(x) == '4'
                     ){
                         Vector2 pos = new Vector2 (x, y);
                         if (!(Arrays.asList(college_locations).contains(pos))){
@@ -348,7 +343,7 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         for (int i = 0; i < num; i ++){
-            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y, 0);
+            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y);
         }
         return colleges;
     }
@@ -361,19 +356,20 @@ public class GameScreen extends ScreenAdapter {
      * @param colleges Array of College objects
      * */
     public void check_collisions(ArrayList<Projectile> balls, College [] colleges){
+
         for (Projectile ball : balls) {
             for (College college : colleges) {
                 if (college.getTilePosition().epsilonEquals(ball.nearestTile())) {
                     if (ball.isByPlayer()) {
                         college.takeDamage(20);
                     }
-                    if (college.isDefeated()) {
+                    if (!(college.isDefeated())) {
                         ball.deactivate(); // if college is defeated, projectiles will travel through.
                     }
                 }
             }
         }
-    }
+        }
     /**
      * Iterates over projectile list and removes deactivated ones.
      * @param balls ArrayList of projectiles, before filtering

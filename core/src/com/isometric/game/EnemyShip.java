@@ -16,7 +16,7 @@ public class EnemyShip{
     private float time;
     private double timeLimit;
     private String direction;
-    private  String[] directionsList;
+    private final String[] directionsList;
     private int numOfMoves;
 
 

@@ -5,12 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import javax.swing.plaf.IconUIResource;
 import java.util.Random;
 
-public class PlayerShip implements Ship{
+public class PlayerShip{
 
     private Texture shipImage;
     public Vector2 position;
@@ -18,6 +19,7 @@ public class PlayerShip implements Ship{
     public Vector2 futurePosition;
     private float _currentTime;
     private float alpha;
+
 
 
     public PlayerShip(IsometricRenderer renderer){
@@ -37,29 +39,30 @@ public class PlayerShip implements Ship{
         futurePosition = new Vector2(position.x, position.y);
     }
 
-    private float calculateAlpha() {
-        _currentTime += Gdx.graphics.getDeltaTime();
-        return 0.8f / _currentTime;
-    }
+//    private float calculateAlpha() {
+//        _currentTime += Gdx.graphics.getDeltaTime();
+//        return 0.8f / _currentTime;
+//    }
 
 
-    @Override
+
     public void render(SpriteBatch batch) {
         batch.draw(shipImage, position.x, position.y);
     }
 
-    @Override
+
     public void update(IsometricRenderer renderer){
 //        System.out.println(position.toString() + futurePosition.toString());
         if (position != futurePosition) {
-            alpha = calculateAlpha();
-            if (alpha != 1) {
-                position.lerp(futurePosition, alpha);
+//            alpha = calculateAlpha();
+//            if (alpha != 1) {
+                position.lerp(futurePosition, 0.1f);
             }
             else {
 //                System.out.println("YAY");
             }
-        }
+//        }
+
         move(renderer);
     }
     //All the movement logic with the use of possibleMove method

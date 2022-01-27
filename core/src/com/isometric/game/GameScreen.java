@@ -13,8 +13,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import sun.jvm.hotspot.tools.SysPropsDumper;
 
 import java.util.ArrayList;
@@ -37,7 +40,19 @@ public class GameScreen extends ScreenAdapter {
     public static final int WIDTH = 320 * 5;
     public boolean MUTED = false;
     private IsometricRenderer renderer;
+
+    //Ships
     private PlayerShip player;
+    private Array<EnemyShip> enemyShips;
+    private EnemyShip enemy1;
+    private EnemyShip enemy2;
+    private EnemyShip enemy3;
+    private EnemyShip enemy4;
+    private EnemyShip enemy5;
+
+    //Collision
+    private Polygon playerBox;
+    private Polygon enemy1Box;
 
     //  Main Menu
     Rectangle play_button;
@@ -81,6 +96,18 @@ public class GameScreen extends ScreenAdapter {
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         renderer = new IsometricRenderer();
         player = new PlayerShip(renderer);
+        playerBox = new Polygon(new float[]{player.position.x, player.position.y - 32, player.position.x + 64, player.position.y, player.position.x, player.position.y + 32, player.position.x -64, player.position.y});
+        enemy1 = new EnemyShip(renderer);
+        enemy2 = new EnemyShip(renderer);
+        enemy3 = new EnemyShip(renderer);
+        enemy4 = new EnemyShip(renderer);
+        enemy5 = new EnemyShip(renderer);
+        enemyShips = new Array<EnemyShip>();
+        enemyShips.add(enemy1);
+        enemyShips.add(enemy2);
+        enemyShips.add(enemy3);
+        enemyShips.add(enemy4);
+        enemyShips.add(enemy5);
         camera.zoom = 0.625f;
 
 
@@ -109,6 +136,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+
 
         //MUTE MUSIC
 /*        if(Gdx.input.isKeyPressed(Input.Keys.M)){
@@ -153,6 +181,11 @@ public class GameScreen extends ScreenAdapter {
             batch.setProjectionMatrix(camera.combined);
             camera.update();
             player.update(renderer);
+            playerBox.setPosition(player.position.x, player.position.y);
+            for (EnemyShip enemyShip : enemyShips){
+                enemyShip.update(renderer);
+            }
+
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batch.begin();
@@ -169,6 +202,9 @@ public class GameScreen extends ScreenAdapter {
                 c.render(batch);
             }
             player.render(batch);
+            for (EnemyShip enemyShip : enemyShips){
+                enemyShip.render(batch);
+            }
             batch.end();
             batchS.begin();
             fontS.draw(batchS, ("SCORE: " + Integer.toString(score)), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight()-50);
@@ -396,6 +432,7 @@ public class GameScreen extends ScreenAdapter {
 //        batch.end();
 //>>>>>>> Stashed changes
     }
+
 
     @Override
     public void dispose() {}

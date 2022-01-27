@@ -35,7 +35,7 @@ public class MapGenerator {
             board[x][y] = "0";
 //            For "growing" the islands
             double temp = probability.nextDouble();
-            while (temp > chance) {
+            while ((temp > chance) && (x>5) && (x<60) && (y>5) && (y<60)) {
                 x += (spawn.nextInt(2)-1);
                 y += (spawn.nextInt(2)-1);
                 board[x][y] = "0";

@@ -207,6 +207,9 @@ public class GameScreen extends ScreenAdapter {
             c.render(batch);
         }
         player.render(batch);
+        for (EnemyShip enemyShip : enemyShips){
+            enemyShip.render(batch);
+        }
         batch.end();
     }
 

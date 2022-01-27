@@ -2,7 +2,6 @@ package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
@@ -15,11 +14,20 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 public class GameScreen extends ScreenAdapter {
 
     enum Screen {
@@ -32,6 +40,13 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch batch, batchS;
     private OrthographicCamera camera;
     private ExtendViewport viewport;
+
+//    GUI
+    private Skin skin;
+    private Stage stage;
+    private Table table;
+    private TextButton playButton;
+    private TextButton quitButton;
 
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
@@ -71,7 +86,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        //GAME
+//        GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
         viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
         viewport.apply();
@@ -79,7 +94,41 @@ public class GameScreen extends ScreenAdapter {
         player = new PlayerShip(renderer);
         camera.zoom = 0.625f;
 
-        //MAIN MENU
+//        GUI
+        stage = new Stage(new ScreenViewport());
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        table = new Table();
+        table.setWidth(stage.getWidth());
+        table.align(Align.center|Align.top);
+
+        table.setPosition(0,Gdx.graphics.getHeight());
+
+        playButton = new TextButton("New Game", skin);
+        quitButton = new TextButton("Quit Game", skin);
+
+        table.add(playButton);
+        table.add(quitButton);
+
+        stage.addActor(table);
+
+        Gdx.input.setInputProcessor(stage);
+
+        playButton.setWidth(100);
+        playButton.setHeight(50);
+
+        final Dialog dialog = new Dialog("Click Message", skin);
+
+        playButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                dialog.show(stage);
+            }
+        });
+
+
+
+//        MAIN MENU
         play_button = new Rectangle();
         exit_button = new Rectangle();
         mute_button = new Rectangle();
@@ -124,6 +173,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+
         if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
             if(!MUTED){
                 BackgroundMusic.setVolume(0f);
@@ -180,32 +230,33 @@ public class GameScreen extends ScreenAdapter {
 //            player.update(renderer);
 //      All rendering in libgdx is done in the sprite batch
             batchRender();
-
+            stage.act(delta);
+            stage.draw();
             //INTERACTION WITH MENU
             //IF PLAYER CLICKS ON THE PLAY BUTTON AND EXIT BUTTON. INPUT ADAPTER CLASS CHECKS IF USER PRESSED MOUSE PAD OR KEYBOARD BUTTON
-            Gdx.input.setInputProcessor(new InputAdapter() {
-                @Override
-                public boolean touchDown(int x, int y, int pointer, int button) {
-                    if(button == Input.Buttons.LEFT) {
-                        if(play_button.contains(mouse_pointer.x, mouse_pointer.y)) {
-                            currentScreen = Screen.MAIN_GAME;
-                        }
-                        else if(exit_button.contains(mouse_pointer.x, mouse_pointer.y)) {
-                            Gdx.app.exit(); //EXIT THE GAME
-                        }
-                        else if(mute_button.contains(mouse_pointer.x, mouse_pointer.y)) {
-                            if(!MUTED) {
-                                BackgroundMusic.setVolume(0f);
-                                MUTED=true;
-                            } else {
-                                BackgroundMusic.setVolume(0.2f);
-                                MUTED=false;
-                            }
-                        }
-                    }
-                    return true;
-                }
-            });
+//            Gdx.input.setInputProcessor(new InputAdapter() {
+//                @Override
+//                public boolean touchDown(int x, int y, int pointer, int button) {
+//                    if(button == Input.Buttons.LEFT) {
+//                        if(play_button.contains(mouse_pointer.x, mouse_pointer.y)) {
+//                            currentScreen = Screen.MAIN_GAME;
+//                        }
+//                        else if(exit_button.contains(mouse_pointer.x, mouse_pointer.y)) {
+//                            Gdx.app.exit(); //EXIT THE GAME
+//                        }
+//                        else if(mute_button.contains(mouse_pointer.x, mouse_pointer.y)) {
+//                            if(!MUTED) {
+//                                BackgroundMusic.setVolume(0f);
+//                                MUTED=true;
+//                            } else {
+//                                BackgroundMusic.setVolume(0.2f);
+//                                MUTED=false;
+//                            }
+//                        }
+//                    }
+//                    return true;
+//                }
+//            });
 
             batch = new SpriteBatch();
             //TITLE

@@ -1,0 +1,14 @@
+{
+  BitmapFont: { default-font: { file: gothicpirate.fnt } },
+
+  TextButtonStyle: {
+    default:
+    //noinspection GDXNonExistingResourceInAlias
+    { down: default-round-down, up: default-round, font: default-font },
+  },
+  WindowStyle: {
+    default: {
+      titleFont: default-font
+    }
+  }
+}

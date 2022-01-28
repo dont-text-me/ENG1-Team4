@@ -22,7 +22,7 @@ public class College {
         float pos_x;
         float pos_y;
         pos_x = (x - y) * (small_tile_width / 2f);
-        pos_y = ((x + y) * (small_tile_height / 4f));
+        pos_y = ((x + y) * (small_tile_height / 4f)) - 17;
         position = new Vector2(pos_x, pos_y);
         //----------------------------------------------
         sprite = new Texture(Gdx.files.internal("college_building/tower_NE.png"));
@@ -34,7 +34,7 @@ public class College {
     /**
      * Renders the college and its healthbar. If college is defeated, renders the college and a white flag.
      * */
-    public void render(SpriteBatch batch, PlayerShip p){
+    public void render(SpriteBatch batch){
         if (health == 100){
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/green.png")),
@@ -65,9 +65,6 @@ public class College {
                     new Texture (Gdx.files.internal("white_flag/white_flag.png")),
                     position.x + (small_tile_width / 2f),
                     position.y + small_tile_height); // drawing out the white flag for defeated colleges
-        }
-        if ((p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100) && (health > 0)) {
-            batch.draw(new Texture(Gdx.files.internal("college_building/firing_marker.png")), position.x + 16, position.y + 70); // when this is rendered, college is about to shoot the player
         }
         batch.draw(sprite, position.x, position.y);
     }

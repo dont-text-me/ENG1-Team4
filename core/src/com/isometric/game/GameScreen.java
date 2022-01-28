@@ -11,13 +11,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Array;
-import sun.jvm.hotspot.tools.SysPropsDumper;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,8 +21,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +76,7 @@ public class GameScreen extends ScreenAdapter {
     int gold = 0;
 
     public College [] colleges;
+    public Coins [] coins;
     public ArrayList <Projectile> balls;
     public int whichCollege = 0;
 
@@ -192,6 +190,7 @@ public class GameScreen extends ScreenAdapter {
         fontS.getData().scale(1);
         texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
         colleges = place_colleges(5);
+        coins = place_coins(10);
         balls = new ArrayList<>();
     }
 
@@ -204,6 +203,9 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         for (College c : colleges){
+            c.render(batch);
+        }
+        for (Coins c : coins){
             c.render(batch);
         }
         player.render(batch);
@@ -315,6 +317,27 @@ public class GameScreen extends ScreenAdapter {
                 c.setHealth(100);
             }
         }
+    }
+    public Coins [] place_coins(int num){
+        Coins [] coins = new Coins[num];
+        Vector2[] coin_locations = new Vector2[num];
+        for (int i = 0; i < num; i ++){
+            for (int y = renderer.board_size; y > 0; y --){
+                for (int x = renderer.board_size; x > 0; x --){
+                    int y1 = MathUtils.random(1, 63);
+                    if ((renderer.map[y1].charAt(x) == '9') && (MathUtils.random(0, 100) == 1)){
+                        Vector2 pos = new Vector2 (x, y1);
+                        if (!(Arrays.asList(coin_locations).contains(pos))){
+                            coin_locations[i] = pos;
+                        }
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < num; i ++){
+            coins[i] = new Coins((int)coin_locations[i].x, (int)coin_locations[i].y);
+        }
+        return coins;
     }
 /**
  * Returns an array of colleges of specified length.

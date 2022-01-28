@@ -159,6 +159,7 @@ public class GameScreen extends ScreenAdapter {
                 player = new PlayerShip(renderer);
                 colleges = place_colleges(5);
                 balls = new ArrayList<>();
+                currentHealth = 10;
             }
         });
 
@@ -203,7 +204,7 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         for (College c : colleges){
-            c.render(batch);
+            c.render(batch, player);
         }
         for (Coins c : coins){
             c.render(batch);
@@ -217,8 +218,9 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height){
-        viewport.update(width, height);
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        stage.getViewport().update(width,height);
+        viewport.update(width, height);
     }
 
     @Override
@@ -312,10 +314,13 @@ public class GameScreen extends ScreenAdapter {
         }
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.R)) {
-            for (College c : colleges){
-                c.setHealth(100);
-            }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            balls.add(new Projectile(
+                    player.tilePosition.y + 1f,
+                    player.tilePosition.x + 1f,
+                    player.getCurrentDirection() == 2f ? 1f : (player.getCurrentDirection() == 3f ? -1f : 0f),
+                    player.getCurrentDirection() == 0f ? 1f : (player.getCurrentDirection() == 1f ? -1f : 0f),
+                    true));
         }
     }
     public Coins [] place_coins(int num){
@@ -382,14 +387,19 @@ public class GameScreen extends ScreenAdapter {
 
         for (Projectile ball : balls) {
             for (College college : colleges) {
-                if (college.getTilePosition().epsilonEquals(ball.nearestTile())) {
+                if (college.getTilePosition().epsilonEquals(ball.nearestTile().x, ball.nearestTile().y, 1.0f)){ // giving the player a little help aiming
                     if (ball.isByPlayer()) {
-                        college.takeDamage(20);
-                    }
-                    if (!(college.isDefeated())) {
-                        ball.deactivate(); // if college is defeated, projectiles will travel through.
+                        college.takeDamage(5);
+                        ball.deactivate();
                     }
                 }
+            }
+            if ((player.tilePosition.epsilonEquals(ball.nearestTile().y, ball.nearestTile().x, 1.0f)) && !(ball.isByPlayer())){
+                if (currentHealth > 0) {
+                    currentHealth -= 0.5;
+                }
+                ball.deactivate();
+                // Player takes damage here
             }
         }
         }

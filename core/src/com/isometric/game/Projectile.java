@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Projectile {
     private final Texture sprite;
-    private final Vector2 position;
+    private Vector2 position;
     private Vector2 tilePosition;
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
@@ -21,7 +21,7 @@ public class Projectile {
         // converting tile position to screen position:
         position = new Vector2(
                 (tilePosition.x - tilePosition.y) * (small_tile_width / 2f),
-                ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f)) - 17
+                ((tilePosition.x + tilePosition.y) * (small_tile_height / 4f))
         );
         delta = new Vector2(delta_x, delta_y);
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
@@ -47,7 +47,7 @@ public class Projectile {
             tilePosition = tilePosition.add(delta);
             // converting tile position to screen position:
             position.x = (tilePosition.x - tilePosition.y) * (small_tile_width / 2f);
-            position.y = (tilePosition.x + tilePosition.y) * (small_tile_height / 4f) - 17;
+            position.y = (tilePosition.x + tilePosition.y) * (small_tile_height / 4f);
             lifetime -= 1;
         }
     }

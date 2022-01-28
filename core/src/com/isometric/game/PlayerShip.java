@@ -52,6 +52,7 @@ public class PlayerShip{
 
 
     public void render(SpriteBatch batch) {
+        batch.draw(new Texture(Gdx.files.internal("ship/player_pointer.png")), position.x + 20, position.y + 64); // to differentiate from non player ships
         batch.draw(shipImage[currentDirection], position.x, position.y);
     }
 
@@ -148,5 +149,18 @@ public class PlayerShip{
             }
         }
         return false;
+    }
+    /**
+     * Returns the ship's current direction as an int. <br>
+     * Options:
+     * <ul>
+     *     <li>0 - northwest</li>
+     *     <li>1 - southeast</li>
+     *     <li>2 - northeast</li>
+     *     <li>3 - southwest</li>
+     * </ul>
+     * */
+    public int getCurrentDirection(){
+        return currentDirection;
     }
 }

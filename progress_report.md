@@ -10,13 +10,13 @@ title: Progress report
       
 </details>
     
- <details>
+<details>
       
-    <summary>Aut/10</summary>
-  
+   <summary>Aut/10</summary>
+      
       * Stuff for week 10
       
- </details>
+</details>
   
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

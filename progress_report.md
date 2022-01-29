@@ -4,6 +4,7 @@ title: Progress report
 <ul>
   <li>
     <details>
+      
       <summary>Aut/9</summary>
   
         * Stuff for week 9
@@ -14,6 +15,7 @@ title: Progress report
 
 <li>
     <details>
+      
       <summary>Aut/10</summary>
   
         * Stuff for week 10

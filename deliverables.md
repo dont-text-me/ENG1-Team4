@@ -1,7 +1,9 @@
 ---
 title: Deliverables
 ---
-This page contains links to the team's deliverables for assesment 1.  
+This page contains links to the team's deliverables for assesment 1. 
+
+For text-based deliverables, each link contains both a PDF for viewing and a google doc for editing.
 
 To view the github repository, click the "View on GitHub" button in the header.
 * [Section 2](https://drive.google.com/drive/folders/1iy4VdLO1xikeHbVJnDN8xbpEZi_cJY_a?usp=sharing) - Requirements

@@ -1,3 +1,6 @@
+---
+title: Home
+---
 # Team Pirate Hygiene
 This webisite contains links to all *Assesment 1* deliverables as well as a weekly progress report.
 

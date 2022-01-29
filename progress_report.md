@@ -1,29 +1,22 @@
 ---
 title: Progress report
 --- 
-<ul>
-  <li>
-    <details>
+
+<details>
       
-      <summary>Aut/9</summary>
+   <summary>Aut/9</summary>
   
-        * Stuff for week 9
+      * Stuff for week 9
       
-    </details>
+</details>
     
-  </li>
-
-<li>
-    <details>
+ <details>
       
-      <summary>Aut/10</summary>
+    <summary>Aut/10</summary>
   
-        * Stuff for week 10
+      * Stuff for week 10
       
-    </details>
+ </details>
   
-  </li>
-
-</ul>
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

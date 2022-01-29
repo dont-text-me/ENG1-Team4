@@ -10,4 +10,4 @@ To view the github repository, click the "View on GitHub" button in the header.
 * [Section 5](https://drive.google.com/drive/folders/1fubShPNiAEDex9UYTb6s30LU2spjNj9L?usp=sharing) - Risk assesment and mitigation
 * [Section 6](https://drive.google.com/drive/folders/11cjrBvw27mRfGJ_VW16qpnXCqIMYn9FV?usp=sharing) - Implementation
 
-<button name="button" onclick="https://beep-boop-boop.github.io/ENG1-Team4/">Home</button>
+[Home](https://beep-boop-boop.github.io/ENG1-Team4/)

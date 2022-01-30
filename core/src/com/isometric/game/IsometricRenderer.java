@@ -1,7 +1,6 @@
 package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -10,24 +9,30 @@ public class IsometricRenderer {
 
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
-    public int board_size = 0;
+    public int board_size;
 
 //    These are globals
 //    For drawCoords, placed here for efficiency.
     public TextureHandler tiles = new TextureHandler();
     private final BitmapFont coordsFont = new BitmapFont();
     private final Texture pinpoint = new Texture(Gdx.files.internal("pinpoint.png"));
-    public FileHandle handle = Gdx.files.local("map.level");
-    public String map_string = handle.readString();
     public String[] map;
     public String[][] board2d;
 
-    public IsometricRenderer() {
+    public IsometricRenderer(boolean randomMap) {
 //      This runs once; the constructor.
-        MapGenerator PirateGame = new MapGenerator();
-        board_size = (PirateGame.size - 1);
-        map = PirateGame.map;
-        board2d = PirateGame.board;
+        if (randomMap) {
+            MapGenerator PirateGame = new MapGenerator();
+            board_size = (PirateGame.size - 1);
+            map = PirateGame.generateMap();
+            board2d = PirateGame.loadBoard();
+        }
+        else {
+            MapGenerator PirateGame = new MapGenerator();
+            board_size = (PirateGame.size - 1);
+            map = PirateGame.loadMap();
+            board2d = PirateGame.loadBoard();
+        }
     }
 
     /** This is used for debug and should not be deleted.
@@ -57,9 +62,6 @@ public class IsometricRenderer {
         float x;
         float y;
         int t;
-
-//        map_string = handle.readString();
-//        map = map_string.split("\\r?\\n");
 
         for (int row = board_size; row >= 0; row--) {
              axis = map[row];

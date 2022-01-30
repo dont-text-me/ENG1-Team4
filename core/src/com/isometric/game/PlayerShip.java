@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.Random;
@@ -28,7 +27,6 @@ public class PlayerShip{
         shipImage[1] = new Texture(Gdx.files.internal("ship/ship_light_SE.png"));
         shipImage[2] = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
         shipImage[3] = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
-
 
         tilePosition = new Vector2();
         //Randomly setting ships' tile position
@@ -67,6 +65,9 @@ public class PlayerShip{
     }
 //    All the movement logic with the use of possibleMove method
     private void move(IsometricRenderer renderer){
+
+
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
             if (tilePosition.x == 62){
 //                do nothing

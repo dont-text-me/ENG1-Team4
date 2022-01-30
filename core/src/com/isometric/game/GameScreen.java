@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -32,7 +33,7 @@ public class GameScreen extends ScreenAdapter {
 
 
     enum Screen {
-        MAIN_MENU, MAIN_GAME, PAUSE_MENU, DIED_MENU
+        MAIN_MENU, MAIN_GAME, PAUSE_MENU, LOSE_SCREEN, WIN_SCREEN
     }
 
     Screen currentScreen = Screen.MAIN_MENU;
@@ -71,9 +72,10 @@ public class GameScreen extends ScreenAdapter {
     public College [] colleges;
     public ArrayList<Projectile> balls;
     public LinkedList<Coin> coins;
-
+    private float point = 0f;
     //Background Music
     Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
+    public Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
     @Override
     public void show() {
@@ -100,8 +102,7 @@ public class GameScreen extends ScreenAdapter {
 
 //        GUI
         stage = new Stage(new ScreenViewport());
-        //    GUI
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+
 
         Table table = new Table();
         table.setWidth(stage.getWidth());
@@ -109,16 +110,17 @@ public class GameScreen extends ScreenAdapter {
 
         table.setPosition(0,Gdx.graphics.getHeight());
 
-        TextButton playButton = new TextButton("Play Game", skin);
-        TextButton quitButton = new TextButton("Quit Game", skin);
+        final TextButton playButton = new TextButton("Play Game", skin);
         final TextButton muteButton = new TextButton("Mute Music", skin);
-        TextButton regenerateButton = new TextButton("Generate New Map", skin);
+        final TextButton howToPlayButton = new TextButton("How to Play", skin);
+        final TextButton quitButton = new TextButton("Quit Game", skin);
+//        TextButton regenerateButton = new TextButton("Generate New Map", skin);
 
         int p = 20;
         table.pad(350);
         table.add(playButton).padBottom(p);
         table.row();
-        table.add(regenerateButton).padBottom(p);
+        table.add(howToPlayButton).padBottom(p);
         table.row();
         table.add(muteButton).padBottom(p);
         table.row();
@@ -145,17 +147,24 @@ public class GameScreen extends ScreenAdapter {
             }
         });
 
-        regenerateButton.addListener(new ClickListener() {
+        howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                renderer = new IsometricRenderer(true);
-                player = new PlayerShip(renderer);
-                colleges = place_colleges(5);
-                coins = placeCoins(20);
-                balls = new ArrayList<>();
-                currentHealth = 10;
+                System.out.println("To Add");
             }
         });
+
+//        regenerateButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                renderer = new IsometricRenderer(true);
+//                player = new PlayerShip(renderer);
+//                colleges = place_colleges(5);
+//                coins = placeCoins(20);
+//                balls = new ArrayList<>();
+//                currentHealth = 10;
+//            }
+//        });
 
 
         muteButton.addListener(new ClickListener() {
@@ -224,6 +233,7 @@ public class GameScreen extends ScreenAdapter {
 
         if (currentHealth < 0.1) {
             isPlayerDead = true;
+            currentScreen = Screen.LOSE_SCREEN;
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
@@ -238,12 +248,17 @@ public class GameScreen extends ScreenAdapter {
 
 //        Updates for calculating ball travel vectors.
         handleInput();
+        Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
 
         if (currentScreen == Screen.MAIN_GAME) {
-            Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            point += delta;
+            if (point > 1) {
+                score ++;
+                point = 0;
+            }
             camera.position.set(player.position.x, player.position.y, 0);
-            batch.setProjectionMatrix(camera.combined);
             camera.update();
             player.update(renderer);
             playerBox.setPosition(player.position.x, player.position.y);
@@ -262,10 +277,11 @@ public class GameScreen extends ScreenAdapter {
                     //noinspection SuspiciousListRemoveInLoop
                     coins.remove(j);
                     gold += 1;
+                    score += 50;
                 }
             }
             for (College c : colleges) {
-                c.update(player);
+                score += c.update(player);
                 if (c.isFiring()){
                     balls.add(c.shoot(player.tilePosition));
                 }
@@ -287,11 +303,7 @@ public class GameScreen extends ScreenAdapter {
             shapeRendererS.rect(Gdx.graphics.getWidth() / 2f - 248, 49, (totalHealth * 50), 20); //draw health bar rectangle
             shapeRendererS.end();
             //
-        } else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU || currentScreen == Screen.DIED_MENU) {
-            Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-            batch.setProjectionMatrix(camera.combined);
+        } else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU) {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
 //            player.update(renderer);
@@ -300,8 +312,24 @@ public class GameScreen extends ScreenAdapter {
             stage.act(delta);
             stage.draw();
 
-            batch = new SpriteBatch();
             //TITLE
+            batch = new SpriteBatch();
+            batch.begin();
+            BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
+            titleFont.setColor(Color.GOLD);
+            titleFont.getData().setScale(2f, 2f);
+            titleFont.draw(batch, "Pirate Hygiene", 150, 800);
+            batch.end();
+        } else if (currentScreen == Screen.LOSE_SCREEN) {
+            camera.position.set(player.position.x, player.position.y, 0);
+            camera.update();
+            batchRender();
+            Dialog winnerDialog = new Dialog("You Win", skin);
+            stage.act(delta);
+            stage.draw();
+
+            //TITLE
+            batch = new SpriteBatch();
             batch.begin();
             BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
             titleFont.setColor(Color.GOLD);
@@ -334,28 +362,6 @@ public class GameScreen extends ScreenAdapter {
         }
         return generatedCoins;
     }
-
-//            for (int y = renderer.board_size; y > 0; y --){
-//                for (int x = renderer.board_size; x > 0; x --){
-//                    if (
-//                            renderer.map[y].charAt(x) == '0' &&
-//                                    renderer.map[y].charAt(x - 1) == '1' &&
-//                                    renderer.map[y].charAt(x + 1) == '3' &&
-//                                    renderer.map[y - 1].charAt(x) == '2'
-//                    ){
-//                        Vector2 pos = new Vector2 (x, y);
-//                        if (!(Arrays.asList(college_locations).contains(pos))){
-//                            college_locations[i] = pos;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        for (int i = 0; i < num; i ++){
-//            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y);
-//        }
-//        return colleges;
-//    }
 
     @Override
     public void dispose() {}

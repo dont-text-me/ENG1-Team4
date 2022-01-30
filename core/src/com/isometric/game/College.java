@@ -32,7 +32,7 @@ public class College {
 
 
     /**
-     * Renders the college and its healthbar. If college is defeated, renders the college and a white flag.
+     * Renders the college and its health bar. If college is defeated, renders the college and a white flag.
      * */
     public void render(SpriteBatch batch, PlayerShip p){
         if (health == 100){
@@ -72,10 +72,13 @@ public class College {
         batch.draw(sprite, position.x, position.y);
     }
 
-    public void update(PlayerShip p){
+    public int update(PlayerShip p){
         if (health <= 0){
-            isDefeated = true;
-            firing = false;
+            if (!isDefeated) {
+                isDefeated = true;
+                firing = false;
+                return 250;
+            }
         }
         else{
             if (p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100){
@@ -91,7 +94,9 @@ public class College {
             else{
                 reloadTime = 60; // if player approaches college, will fire after 1 frame
             }
+            return 0;
         }
+        return 0;
     }
 
     public boolean isFiring(){

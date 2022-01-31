@@ -1,5 +1,8 @@
 package com.isometric.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -12,9 +15,30 @@ public class MapGenerator {
     int islands = size / 2;
     public String[][] board = new String[size][size];
     public String[] map = new String[size];
+    public String map_string;
+
     // Fill each row with 1.0
 
-    public MapGenerator() {
+    public String[] loadMap() {
+        FileHandle handle = Gdx.files.local("map.level");
+        map_string = handle.readString();
+        map = map_string.split("\\r?\\n");
+        return map;
+    }
+
+    public String[][] loadBoard() {
+        int y = 0;
+        for (String line : map) {
+            for (int i = 0; i<line.length(); i++) {
+                board[y][i] = line.substring(i,i+1);
+            }
+            y ++ ;
+        }
+        return board;
+    }
+
+
+    public String[] generateMap() {
 
         for (String[] row: board) {
             Arrays.fill(row, "9");
@@ -231,6 +255,6 @@ public class MapGenerator {
             counter += 1;
             output = new StringBuilder();
         }
+        return map;
     }
-
 }

@@ -11,88 +11,85 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GameScreen extends ScreenAdapter {
 
-    public GameScreen() {
-    }
+
+
 
     enum Screen {
-        MAIN_MENU, MAIN_GAME, PAUSE_MENU
+        MAIN_MENU, MAIN_GAME, PAUSE_MENU, LOSE_SCREEN, WIN_SCREEN
     }
 
     Screen currentScreen = Screen.MAIN_MENU;
 
-//  Screen Size
+    //  Screen Size
     private SpriteBatch batch, batchS;
     private OrthographicCamera camera;
-    private ExtendViewport viewport;
+    private ScreenViewport viewport;
 
     private Stage stage;
 
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
-    public boolean MUTED = false;
+    public boolean MUTED = true;
     private IsometricRenderer renderer;
 
     //Ships
     private PlayerShip player;
     private Array<EnemyShip> enemyShips;
-    private EnemyShip enemy1;
-    private EnemyShip enemy2;
-    private EnemyShip enemy3;
-    private EnemyShip enemy4;
-    private EnemyShip enemy5;
+    @SuppressWarnings("All")
+    private boolean isPlayerDead = false;
 
     private BitmapFont fontS;
     private ShapeRenderer shapeRendererS;
 
     Texture texture;
     float totalHealth = 10;
-//    float enemyDamage = 1;
+    //    float enemyDamage = 1;
     float currentHealth = totalHealth;
     int score = 0;
     int gold = 0;
 
     public College [] colleges;
-    public Coins [] coins;
-    public ArrayList <Projectile> balls;
-    public int whichCollege = 0;
-
+    public ArrayList<Projectile> balls;
+    public LinkedList<Coin> coins;
+    private float point = 0f;
     //Background Music
     Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
+    public Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
     @Override
     public void show() {
 //        GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
-        viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
+//        viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
+        viewport = new ScreenViewport(camera);
         viewport.apply();
-        renderer = new IsometricRenderer();
+        renderer = new IsometricRenderer(false);
         player = new PlayerShip(renderer);
-        enemy1 = new EnemyShip(renderer, player);
-        enemy2 = new EnemyShip(renderer, player);
-        enemy3 = new EnemyShip(renderer, player);
-        enemy4 = new EnemyShip(renderer, player);
-        enemy5 = new EnemyShip(renderer, player);
-        enemyShips = new Array<EnemyShip>();
+        playerBox = new Polygon(new float[]{player.position.x, player.position.y - 32, player.position.x + 64, player.position.y, player.position.x, player.position.y + 32, player.position.x -64, player.position.y});
+        EnemyShip enemy1 = new EnemyShip(renderer);
+        EnemyShip enemy2 = new EnemyShip(renderer);
+        EnemyShip enemy3 = new EnemyShip(renderer);
+        EnemyShip enemy4 = new EnemyShip(renderer);
+        EnemyShip enemy5 = new EnemyShip(renderer);
+        enemyShips = new Array<>();
         enemyShips.add(enemy1);
         enemyShips.add(enemy2);
         enemyShips.add(enemy3);
@@ -102,8 +99,7 @@ public class GameScreen extends ScreenAdapter {
 
 //        GUI
         stage = new Stage(new ScreenViewport());
-        //    GUI
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+
 
         Table table = new Table();
         table.setWidth(stage.getWidth());
@@ -111,16 +107,17 @@ public class GameScreen extends ScreenAdapter {
 
         table.setPosition(0,Gdx.graphics.getHeight());
 
-        TextButton playButton = new TextButton("Play Game", skin);
-        TextButton quitButton = new TextButton("Quit Game", skin);
+        final TextButton playButton = new TextButton("Play Game", skin);
         final TextButton muteButton = new TextButton("Mute Music", skin);
-        TextButton regenerateButton = new TextButton("Generate New Map", skin);
+        final TextButton howToPlayButton = new TextButton("How to Play", skin);
+        final TextButton quitButton = new TextButton("Quit Game", skin);
+//        TextButton regenerateButton = new TextButton("Generate New Map", skin);
 
         int p = 20;
         table.pad(350);
         table.add(playButton).padBottom(p);
         table.row();
-        table.add(regenerateButton).padBottom(p);
+        table.add(howToPlayButton).padBottom(p);
         table.row();
         table.add(muteButton).padBottom(p);
         table.row();
@@ -147,16 +144,24 @@ public class GameScreen extends ScreenAdapter {
             }
         });
 
-        regenerateButton.addListener(new ClickListener() {
+        howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                renderer = new IsometricRenderer();
-                player = new PlayerShip(renderer);
-                colleges = place_colleges(5);
-                balls = new ArrayList<>();
-                currentHealth = 10;
+                System.out.println("To Add");
             }
         });
+
+//        regenerateButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                renderer = new IsometricRenderer(true);
+//                player = new PlayerShip(renderer);
+//                colleges = place_colleges(5);
+//                coins = placeCoins(20);
+//                balls = new ArrayList<>();
+//                currentHealth = 10;
+//            }
+//        });
 
 
         muteButton.addListener(new ClickListener() {
@@ -175,7 +180,7 @@ public class GameScreen extends ScreenAdapter {
         });
 
         BackgroundMusic.setLooping(true);
-        BackgroundMusic.setVolume(0.2f);
+        BackgroundMusic.setVolume(0f);
         BackgroundMusic.play();
 
 //        In game GUI
@@ -186,13 +191,17 @@ public class GameScreen extends ScreenAdapter {
         fontS.getData().scale(1);
         texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
         colleges = place_colleges(5);
-        coins = place_coins(10);
+        coins = placeCoins(20);
         balls = new ArrayList<>();
     }
 
     private void batchRender() {
         batch.begin();
         renderer.drawBoard(batch);
+//        renderer.drawCoordinates(batch, true);
+        for (Coin c: coins) {
+            c.render(batch);
+        }
         for (Projectile ball : balls) {
             if (ball.isActive()) {
                 ball.render(batch);
@@ -201,10 +210,8 @@ public class GameScreen extends ScreenAdapter {
         for (College c : colleges){
             c.render(batch, player);
         }
-        for (Coins c : coins){
-            c.render(batch);
-        }
         player.render(batch);
+        //noinspection GDXJavaUnsafeIterator
         for (EnemyShip enemyShip : enemyShips){
             enemyShip.render(batch);
         }
@@ -221,6 +228,11 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
 
+        if (currentHealth < 0.1) {
+            isPlayerDead = true;
+            currentScreen = Screen.LOSE_SCREEN;
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             if (!MUTED) {
                 BackgroundMusic.setVolume(0f);
@@ -233,12 +245,17 @@ public class GameScreen extends ScreenAdapter {
 
 //        Updates for calculating ball travel vectors.
         handleInput();
+        Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(camera.combined);
 
         if (currentScreen == Screen.MAIN_GAME) {
-            Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            point += delta;
+            if (point > 1) {
+                score ++;
+                point = 0;
+            }
             camera.position.set(player.position.x, player.position.y, 0);
-            batch.setProjectionMatrix(camera.combined);
             camera.update();
             player.update(renderer, enemyShips);
             for (EnemyShip enemyShip : enemyShips){
@@ -249,8 +266,16 @@ public class GameScreen extends ScreenAdapter {
             for (Projectile ball : balls) {
                 ball.update();
             }
+            for (int j = 0; j < coins.size(); j++) {
+                if (coins.get(j).update(player)) {
+                    //noinspection SuspiciousListRemoveInLoop
+                    coins.remove(j);
+                    gold += 1;
+                    score += 50;
+                }
+            }
             for (College c : colleges) {
-                c.update(player);
+                score += c.update(player);
                 if (c.isFiring()){
                     balls.add(c.shoot(player.tilePosition));
                 }
@@ -273,10 +298,6 @@ public class GameScreen extends ScreenAdapter {
             shapeRendererS.end();
             //
         } else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU) {
-            Gdx.gl.glClearColor(44f / 255, 97f / 255, 129f / 255, 1);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-            batch.setProjectionMatrix(camera.combined);
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
 //            player.update(renderer);
@@ -285,8 +306,24 @@ public class GameScreen extends ScreenAdapter {
             stage.act(delta);
             stage.draw();
 
-            batch = new SpriteBatch();
             //TITLE
+            batch = new SpriteBatch();
+            batch.begin();
+            BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
+            titleFont.setColor(Color.GOLD);
+            titleFont.getData().setScale(2f, 2f);
+            titleFont.draw(batch, "Pirate Hygiene", 150, 800);
+            batch.end();
+        } else if (currentScreen == Screen.LOSE_SCREEN) {
+            camera.position.set(player.position.x, player.position.y, 0);
+            camera.update();
+            batchRender();
+            Dialog winnerDialog = new Dialog("You Win", skin);
+            stage.act(delta);
+            stage.draw();
+
+            //TITLE
+            batch = new SpriteBatch();
             batch.begin();
             BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
             titleFont.setColor(Color.GOLD);
@@ -296,6 +333,29 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    public LinkedList<Coin> placeCoins(int num) {
+        LinkedList<Coin> generatedCoins = new LinkedList<>();
+        Vector2[] coinLocations = new Vector2[num];
+        int i = 0;
+        while (i < num) {
+            Random random = new Random();
+            int x = random.nextInt(57) + 4;
+            int y = random.nextInt(57) + 4;
+
+
+            if (renderer.board2d[y][x].equals("9")) {
+                Vector2 pos = new Vector2(x, y);
+                if (!(Arrays.asList(coinLocations).contains(pos))) {
+                    coinLocations[i] = pos;
+                    i++;
+                }
+            }
+        }
+        for (int j = 0; j < num; j ++){
+            generatedCoins.add(j, new Coin((int) coinLocations[j].x, (int) coinLocations[j].y));
+        }
+        return generatedCoins;
+    }
 
     @Override
     public void dispose() {}
@@ -310,32 +370,11 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             balls.add(new Projectile(
                     player.tilePosition.y + 1f,
-                    player.tilePosition.x + 1f,
+                    player.tilePosition.x + 0.25f,
                     player.getCurrentDirection() == 2f ? 1f : (player.getCurrentDirection() == 3f ? -1f : 0f),
                     player.getCurrentDirection() == 0f ? 1f : (player.getCurrentDirection() == 1f ? -1f : 0f),
                     true));
         }
-    }
-    public Coins [] place_coins(int num){
-        Coins [] coins = new Coins[num];
-        Vector2[] coin_locations = new Vector2[num];
-        for (int i = 0; i < num; i ++){
-            for (int y = renderer.board_size; y > 0; y --){
-                for (int x = renderer.board_size; x > 0; x --){
-                    int y1 = MathUtils.random(1, 63);
-                    if ((renderer.map[y1].charAt(x) == '9') && (MathUtils.random(0, 100) == 1)){
-                        Vector2 pos = new Vector2 (x, y1);
-                        if (!(Arrays.asList(coin_locations).contains(pos))){
-                            coin_locations[i] = pos;
-                        }
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < num; i ++){
-            coins[i] = new Coins((int)coin_locations[i].x, (int)coin_locations[i].y);
-        }
-        return coins;
     }
 /**
  * Returns an array of colleges of specified length.
@@ -387,6 +426,7 @@ public class GameScreen extends ScreenAdapter {
                     }
                 }
             }
+            //noinspection SuspiciousNameCombination
             if ((player.tilePosition.epsilonEquals(ball.nearestTile().y, ball.nearestTile().x, 1.0f)) && !(ball.isByPlayer())){
                 if (currentHealth > 0) {
                     currentHealth -= 0.5;
@@ -411,4 +451,3 @@ public class GameScreen extends ScreenAdapter {
         return output;
     }
 }
-

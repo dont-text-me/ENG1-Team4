@@ -52,17 +52,11 @@ public class Projectile {
         }
     }
 
-    public boolean isActive(){
-        return active;
-    }
+    public boolean isActive(){ return active; }
 
-    public void deactivate(){
-        active = false;
-    }
+    public void deactivate(){ active = false; }
 
-    public boolean isByPlayer(){
-        return byPlayer;
-    }
+    public boolean isByPlayer(){ return byPlayer; }
 
     /**
      * Returns the coordinates of the tile the projectile is currently in.
@@ -72,5 +66,4 @@ public class Projectile {
     public Vector2 nearestTile(){
         return new Vector2 ((float)Math.floor(tilePosition.x), (float)Math.floor(tilePosition.y));
     }
-
 }

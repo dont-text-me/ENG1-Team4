@@ -11,11 +11,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -26,7 +25,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.*;
 
-
+@SuppressWarnings("CommentedOutCode")
 public class GameScreen extends ScreenAdapter {
 
 
@@ -44,6 +43,7 @@ public class GameScreen extends ScreenAdapter {
     private ScreenViewport viewport;
 
     private Stage stage;
+    private Stage lossStage;
 
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
@@ -62,7 +62,7 @@ public class GameScreen extends ScreenAdapter {
     Texture texture;
     float totalHealth = 10;
     //    float enemyDamage = 1;
-    float currentHealth = totalHealth;
+    float currentHealth = 1;
     int score = 0;
     int gold = 0;
 
@@ -73,6 +73,13 @@ public class GameScreen extends ScreenAdapter {
     //Background Music
     Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
     public Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+    final TextButton playButton = new TextButton("Play Game", skin);
+    final TextButton muteButton = new TextButton("Mute Music", skin);
+    final TextButton howToPlayButton = new TextButton("How to Play", skin);
+    final TextButton quitButton = new TextButton("Quit Game", skin);
+//    final TextButton regenerateButton = new TextButton("Generate New Map", skin);
+    final TextButton mainMenuButton = new TextButton("Main Menu", skin);
+
 
     @Override
     public void show() {
@@ -96,21 +103,13 @@ public class GameScreen extends ScreenAdapter {
         enemyShips.add(enemy5);
         camera.zoom = 0.625f;
 
-//        GUI
+//        main stage
         stage = new Stage(new ScreenViewport());
-
 
         Table table = new Table();
         table.setWidth(stage.getWidth());
         table.align(Align.center|Align.top);
-
         table.setPosition(0,Gdx.graphics.getHeight());
-
-        final TextButton playButton = new TextButton("Play Game", skin);
-        final TextButton muteButton = new TextButton("Mute Music", skin);
-        final TextButton howToPlayButton = new TextButton("How to Play", skin);
-        final TextButton quitButton = new TextButton("Quit Game", skin);
-//        TextButton regenerateButton = new TextButton("Generate New Map", skin);
 
         int p = 20;
         table.pad(350);
@@ -150,6 +149,9 @@ public class GameScreen extends ScreenAdapter {
             }
         });
 
+//        This enables and old in-dev regenerate button that procedurally generates terrain.
+//        Enable at your own peril.
+//
 //        regenerateButton.addListener(new ClickListener() {
 //            @Override
 //            public void clicked(InputEvent event, float x, float y) {
@@ -161,7 +163,6 @@ public class GameScreen extends ScreenAdapter {
 //                currentHealth = 10;
 //            }
 //        });
-
 
         muteButton.addListener(new ClickListener() {
             @Override
@@ -178,6 +179,27 @@ public class GameScreen extends ScreenAdapter {
             }
         });
 
+        lossStage = new Stage(new ScreenViewport());
+        Table lossTable = new Table();
+        lossTable.setWidth(stage.getWidth());
+        lossTable.align(Align.center|Align.top);
+        lossTable.setPosition(0,Gdx.graphics.getHeight());
+
+        mainMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.input.setInputProcessor(stage);
+                currentHealth = totalHealth;
+                renderer = new IsometricRenderer(false);
+                player = new PlayerShip(renderer);
+                currentScreen = Screen.MAIN_MENU;
+            }
+        });
+
+        lossTable.add(mainMenuButton).padTop(450);
+        lossStage.addActor(lossTable);
+
+//        Background Music
         BackgroundMusic.setLooping(true);
         BackgroundMusic.setVolume(0f);
         BackgroundMusic.play();
@@ -221,6 +243,7 @@ public class GameScreen extends ScreenAdapter {
     public void resize(int width, int height){
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         stage.getViewport().update(width,height);
+        lossStage.getViewport().update(width, height);
         viewport.update(width, height);
     }
 
@@ -229,6 +252,11 @@ public class GameScreen extends ScreenAdapter {
 
         if (currentHealth < 0.1) {
             isPlayerDead = true;
+            Gdx.input.setInputProcessor(lossStage);
+            playButton.setTouchable(Touchable.disabled);
+            howToPlayButton.setTouchable(Touchable.disabled);
+            muteButton.setTouchable(Touchable.disabled);
+            quitButton.setTouchable(Touchable.disabled);
             currentScreen = Screen.LOSE_SCREEN;
         }
 
@@ -249,6 +277,12 @@ public class GameScreen extends ScreenAdapter {
         batch.setProjectionMatrix(camera.combined);
 
         if (currentScreen == Screen.MAIN_GAME) {
+            playButton.setTouchable(Touchable.disabled);
+            howToPlayButton.setTouchable(Touchable.disabled);
+            muteButton.setTouchable(Touchable.disabled);
+            quitButton.setTouchable(Touchable.disabled);
+
+
             point += delta;
             if (point > 1) {
                 score ++;
@@ -257,6 +291,7 @@ public class GameScreen extends ScreenAdapter {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
             player.update(renderer, enemyShips);
+            //noinspection GDXJavaUnsafeIterator
             for (EnemyShip enemyShip : enemyShips){
                 enemyShip.update(renderer, player, enemyShips);
             }
@@ -297,39 +332,34 @@ public class GameScreen extends ScreenAdapter {
             shapeRendererS.end();
             //
         } else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU) {
+            playButton.setTouchable(Touchable.enabled);
+            howToPlayButton.setTouchable(Touchable.enabled);
+            muteButton.setTouchable(Touchable.enabled);
+            quitButton.setTouchable(Touchable.enabled);
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
-//            player.update(renderer);
-//      All rendering in libgdx is done in the sprite batch
             batchRender();
             stage.act(delta);
             stage.draw();
-
             //TITLE
-            batch = new SpriteBatch();
-            batch.begin();
-            BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
-            titleFont.setColor(Color.GOLD);
-            titleFont.getData().setScale(2f, 2f);
-            titleFont.draw(batch, "Pirate Hygiene", 150, 800);
-            batch.end();
+            drawTitle();
         } else if (currentScreen == Screen.LOSE_SCREEN) {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
             batchRender();
-            Dialog winnerDialog = new Dialog("You Win", skin);
-            stage.act(delta);
-            stage.draw();
-
-            //TITLE
-            batch = new SpriteBatch();
-            batch.begin();
-            BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
-            titleFont.setColor(Color.GOLD);
-            titleFont.getData().setScale(2f, 2f);
-            titleFont.draw(batch, "Pirate Hygiene", 150, 800);
-            batch.end();
+            lossStage.act(delta);
+            lossStage.draw();
         }
+    }
+
+    private void drawTitle() {
+        batch = new SpriteBatch();
+        batch.begin();
+        BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
+        titleFont.setColor(Color.GOLD);
+        titleFont.getData().setScale(2f, 2f);
+        titleFont.draw(batch, "Pirate Hygiene", 150, 800);
+        batch.end();
     }
 
     public LinkedList<Coin> placeCoins(int num) {
@@ -375,12 +405,13 @@ public class GameScreen extends ScreenAdapter {
                     true));
         }
     }
-/**
- * Returns an array of colleges of specified length.
- * Colleges are placed on islands with 1 patch of grass surrounded by beach
- * @param num the desired number of colleges
- * @return the array containing College objects, placed on islands on the game map
- * */
+
+    /**
+     * Returns an array of colleges of specified length.
+     * Colleges are placed on islands with 1 patch of grass surrounded by beach
+     * @param num the desired number of colleges
+     * @return the array containing College objects, placed on islands on the game map
+     * */
     public College [] place_colleges(int num){
         College [] colleges = new College[num];
         Vector2[] college_locations = new Vector2[num];
@@ -389,9 +420,9 @@ public class GameScreen extends ScreenAdapter {
                 for (int x = renderer.board_size; x > 0; x --){
                     if (
                             renderer.map[y].charAt(x) == '0' &&
-                            renderer.map[y].charAt(x - 1) == '1' &&
-                            renderer.map[y].charAt(x + 1) == '3' &&
-                            renderer.map[y - 1].charAt(x) == '2'
+                                    renderer.map[y].charAt(x - 1) == '1' &&
+                                    renderer.map[y].charAt(x + 1) == '3' &&
+                                    renderer.map[y - 1].charAt(x) == '2'
                     ){
                         Vector2 pos = new Vector2 (x, y);
                         if (!(Arrays.asList(college_locations).contains(pos))){

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
 
@@ -57,21 +58,36 @@ public class PlayerShip{
     }
 
 
-    public void update(IsometricRenderer renderer){
+    public void update(IsometricRenderer renderer, Array<EnemyShip> enemyShips){
         if (position != futurePosition) {
 //            alpha = calculateAlpha();
 //            if (alpha != 1) {
                 position.lerp(futurePosition, 0.1f);
             }
-        move(renderer);
+        move(renderer, calcNearest(tilePosition, enemyShips));
+    }
+
+    private static EnemyShip calcNearest(Vector2 playerPos, Array<EnemyShip> enemyShips){
+        EnemyShip closest =  enemyShips.get(0);
+
+        for (int i = 1; i < enemyShips.size; i++){
+            EnemyShip current = enemyShips.get(i);
+            if (playerPos.dst(current.tilePosition) < playerPos.dst(closest.tilePosition)){
+                closest = current;
+            }
+        }
+        return closest;
     }
 //    All the movement logic with the use of possibleMove method
-    private void move(IsometricRenderer renderer){
+    private void move(IsometricRenderer renderer, EnemyShip nearestEnemyShip){
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)){
             if (tilePosition.x == 62){
 //                do nothing
                 assert true;
             }
+            else if (tilePosition.x + 2 == nearestEnemyShip.tilePosition.x && tilePosition.y == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x + 2 == nearestEnemyShip.tilePosition.x && tilePosition.y - 1 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x + 2 == nearestEnemyShip.tilePosition.x && tilePosition.y + 1 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "W")){
                 currentDirection = 0;
                 tilePosition.x += 1;
@@ -86,6 +102,9 @@ public class PlayerShip{
 //                do nothing
                 assert true;
             }
+            else if (tilePosition.x - 2 == nearestEnemyShip.tilePosition.x && tilePosition.y == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x - 2 == nearestEnemyShip.tilePosition.x && tilePosition.y - 1 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x - 2 == nearestEnemyShip.tilePosition.x && tilePosition.y + 1 == nearestEnemyShip.tilePosition.y){}
             else if(possibleMove(renderer, "S")){
                 currentDirection = 1;
                 tilePosition.x -= 1;
@@ -99,6 +118,9 @@ public class PlayerShip{
 //                do nothing
                 assert true;
             }
+            else if (tilePosition.x == nearestEnemyShip.tilePosition.x && tilePosition.y + 2 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x - 1  == nearestEnemyShip.tilePosition.x && tilePosition.y + 2 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x + 1 == nearestEnemyShip.tilePosition.x && tilePosition.y + 2 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "D")) {
                 currentDirection = 2;
                 tilePosition.y += 1;
@@ -112,6 +134,9 @@ public class PlayerShip{
 //                do nothing
                 assert true;
             }
+            else if (tilePosition.x == nearestEnemyShip.tilePosition.x && tilePosition.y - 2 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x - 1  == nearestEnemyShip.tilePosition.x && tilePosition.y - 2 == nearestEnemyShip.tilePosition.y ||
+                    tilePosition.x + 1 == nearestEnemyShip.tilePosition.x && tilePosition.y - 2 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "A")) {
                 currentDirection = 3;
                 tilePosition.y -= 1;

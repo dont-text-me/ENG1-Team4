@@ -61,10 +61,6 @@ public class GameScreen extends ScreenAdapter {
     private EnemyShip enemy4;
     private EnemyShip enemy5;
 
-    //Collision
-    private Polygon playerBox;
-    private Polygon enemy1Box;
-
     private BitmapFont fontS;
     private ShapeRenderer shapeRendererS;
 
@@ -91,12 +87,11 @@ public class GameScreen extends ScreenAdapter {
         viewport.apply();
         renderer = new IsometricRenderer();
         player = new PlayerShip(renderer);
-        playerBox = new Polygon(new float[]{player.position.x, player.position.y - 32, player.position.x + 64, player.position.y, player.position.x, player.position.y + 32, player.position.x -64, player.position.y});
-        enemy1 = new EnemyShip(renderer);
-        enemy2 = new EnemyShip(renderer);
-        enemy3 = new EnemyShip(renderer);
-        enemy4 = new EnemyShip(renderer);
-        enemy5 = new EnemyShip(renderer);
+        enemy1 = new EnemyShip(renderer, player);
+        enemy2 = new EnemyShip(renderer, player);
+        enemy3 = new EnemyShip(renderer, player);
+        enemy4 = new EnemyShip(renderer, player);
+        enemy5 = new EnemyShip(renderer, player);
         enemyShips = new Array<EnemyShip>();
         enemyShips.add(enemy1);
         enemyShips.add(enemy2);
@@ -245,12 +240,10 @@ public class GameScreen extends ScreenAdapter {
             camera.position.set(player.position.x, player.position.y, 0);
             batch.setProjectionMatrix(camera.combined);
             camera.update();
-            player.update(renderer);
-            playerBox.setPosition(player.position.x, player.position.y);
+            player.update(renderer, enemyShips);
             for (EnemyShip enemyShip : enemyShips){
-                enemyShip.update(renderer);
+                enemyShip.update(renderer, player, enemyShips);
             }
-
             balls = filter_projectiles(balls);
             check_collisions(balls, colleges);
             for (Projectile ball : balls) {

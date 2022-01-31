@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.Random;
 
@@ -20,7 +21,7 @@ public class EnemyShip{
     private int numOfMoves;
 
 
-    public EnemyShip(IsometricRenderer renderer){
+    public EnemyShip(IsometricRenderer renderer, PlayerShip playerShip){
         directionsList = new String[]{"EnemyShip/ship_dark_NW.png", "EnemyShip/ship_dark_SE.png", "EnemyShip/ship_dark_NE.png", "EnemyShip/ship_dark_SW.png"};
         direction = directionsList[new Random().nextInt(4)];
         shipImage = new Texture(Gdx.files.internal(direction));
@@ -46,33 +47,52 @@ public class EnemyShip{
         batch.draw(shipImage, position.x, position.y);
     }
 
-    public void update(IsometricRenderer renderer) {
+    public void update(IsometricRenderer renderer, PlayerShip playerShip, Array<EnemyShip> enemyShips) {
         time += Gdx.graphics.getDeltaTime();
         if (position != futurePosition){
             position.lerp(futurePosition, 0.1f);
             if (time > timeLimit){
-                move(renderer);
+                move(renderer, playerShip, calcNearest(tilePosition, enemyShips));
             }
         }
     }
 
-    public void move(IsometricRenderer renderer){
+    private static EnemyShip calcNearest(Vector2 playerPos, Array<EnemyShip> enemyShips){
+        EnemyShip closest =  enemyShips.get(0);
+
+        for (int i = 1; i < enemyShips.size; i++){
+            EnemyShip current = enemyShips.get(i);
+            if (playerPos.dst(current.tilePosition) < playerPos.dst(closest.tilePosition)){
+                closest = current;
+            }
+        }
+        return closest;
+    }
+
+    public void move(IsometricRenderer renderer, PlayerShip playerShip, EnemyShip nearestEnemyShip){
         if (numOfMoves != 0){
             if(direction == "EnemyShip/ship_dark_NW.png") {
-                if (tilePosition.x != 61) {
+                if  (tilePosition.x + 2 == playerShip.tilePosition.x && tilePosition.y == playerShip.tilePosition.y ||
+                        tilePosition.x + 2 == playerShip.tilePosition.x && tilePosition.y - 1 == playerShip.tilePosition.y ||
+                        tilePosition.x + 2 == playerShip.tilePosition.x && tilePosition.y + 1 == playerShip.tilePosition.y){}
+                else if (tilePosition.x != 61) {
                     String row = renderer.map[(int) tilePosition.x + 1];
-                    if (Character.getNumericValue(row.charAt((int) tilePosition.y)) != 9){
+                    if (Character.getNumericValue(row.charAt((int) tilePosition.y)) != 9) {
                         direction = directionsList[new Random().nextInt(4)];
-                    }else{
+                    } else {
                         shipImage = new Texture(Gdx.files.internal("EnemyShip/ship_dark_NW.png"));
                         tilePosition.x += 1;
                         numOfMoves -= 1;
                     }
-                } else {
+                }else {
                     direction = "EnemyShip/ship_dark_SE.png";
                 }
+
             }else if(direction == "EnemyShip/ship_dark_SE.png"){
-                if (tilePosition.x != 1){
+                if (tilePosition.x - 2 == playerShip.tilePosition.x && tilePosition.y == playerShip.tilePosition.y ||
+                        tilePosition.x - 2 == playerShip.tilePosition.x && tilePosition.y - 1 == playerShip.tilePosition.y ||
+                        tilePosition.x - 2 == playerShip.tilePosition.x && tilePosition.y + 1 == playerShip.tilePosition.y){}
+                else if (tilePosition.x != 1){
                     String row = renderer.map[(int) tilePosition.x - 1];
                     if (Character.getNumericValue(row.charAt((int) tilePosition.y)) != 9){
                         direction = directionsList[new Random().nextInt(4)];
@@ -85,7 +105,10 @@ public class EnemyShip{
                     direction = "EnemyShip/ship_dark_NW.png";
                 }
             }else if (direction == "EnemyShip/ship_dark_NE.png"){
-                if (tilePosition.y != 62){
+                if (tilePosition.x == playerShip.tilePosition.x && tilePosition.y + 2 == playerShip.tilePosition.y ||
+                        tilePosition.x - 1  == playerShip.tilePosition.x && tilePosition.y + 2 == playerShip.tilePosition.y ||
+                        tilePosition.x + 1 == playerShip.tilePosition.x && tilePosition.y + 2 == playerShip.tilePosition.y){}
+                else if (tilePosition.y != 62){
                     String row = renderer.map[(int) tilePosition.x];
                     if (Character.getNumericValue(row.charAt((int) tilePosition.y + 1)) != 9) {
                         direction = directionsList[new Random().nextInt(4)];
@@ -98,7 +121,10 @@ public class EnemyShip{
                     direction = "EnemyShip/ship_dark_SW.png";
                 }
             }else if (direction == "EnemyShip/ship_dark_SW.png"){
-                if (tilePosition.y != 1){
+                if (tilePosition.x == playerShip.tilePosition.x && tilePosition.y - 2 == playerShip.tilePosition.y ||
+                        tilePosition.x - 1  == playerShip.tilePosition.x && tilePosition.y - 2 == playerShip.tilePosition.y ||
+                        tilePosition.x + 1 == playerShip.tilePosition.x && tilePosition.y - 2 == playerShip.tilePosition.y){}
+                else if (tilePosition.y != 1){
                     String row = renderer.map[(int) tilePosition.x];
                     if (Character.getNumericValue(row.charAt((int) tilePosition.y - 1)) != 9){
                         direction = directionsList[new Random().nextInt(4)];

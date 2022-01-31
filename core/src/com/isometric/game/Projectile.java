@@ -16,7 +16,7 @@ public class Projectile {
     private final boolean byPlayer; // determines whether the projectile has been shot by the player
     private Vector2 delta; // specifies the movement in *Tiles* of the projectile
     public Projectile(float x, float y, float delta_x, float delta_y, boolean player){
-        lifetime = 30;
+        lifetime = 80;
         tilePosition = new Vector2(x, y);
         // converting tile position to screen position:
         position = new Vector2(
@@ -25,6 +25,9 @@ public class Projectile {
         );
         delta = new Vector2(delta_x, delta_y);
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
+//        delta.x = delta.x/8f;
+//        delta.y = delta.y/8f;
+        delta.scl(1/8f);
         sprite = new Texture(Gdx.files.internal("cannon_ball/cannonBall_NE.png"));
         byPlayer = player;
     }

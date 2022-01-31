@@ -11,4 +11,9 @@
       titleFont: default-font
     }
   }
+  LabelStyle: {
+    default: {
+      font: default-font
+    }
+  }
 }

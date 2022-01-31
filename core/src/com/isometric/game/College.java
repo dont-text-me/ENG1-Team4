@@ -26,7 +26,7 @@ public class College {
         position = new Vector2(pos_x, pos_y);
         //----------------------------------------------
         sprite = new Texture(Gdx.files.internal("college_building/tower_NE.png"));
-        reloadTime = 60; // will fire every 30 frames, change as needed
+        reloadTime = 300; // will fire every 30 frames, change as needed
         firing = false;
     }
 
@@ -35,6 +35,7 @@ public class College {
      * Renders the college and its health bar. If college is defeated, renders the college and a white flag.
      * */
     public void render(SpriteBatch batch, PlayerShip p){
+        batch.draw(sprite, position.x, position.y);
         if (health == 100){
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/green.png")),
@@ -64,12 +65,11 @@ public class College {
             batch.draw(
                     new Texture (Gdx.files.internal("white_flag/white_flag.png")),
                     position.x + (small_tile_width / 2f),
-                    position.y + small_tile_height); // drawing out the white flag for defeated colleges
+                    position.y + small_tile_height -10); // drawing out the white flag for defeated colleges
         }
         if ((p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100) && (health > 0)) {
             batch.draw(new Texture(Gdx.files.internal("college_building/firing_marker.png")), position.x + 16, position.y + 70); // when this is rendered, college is about to shoot the player
         }
-        batch.draw(sprite, position.x, position.y);
     }
 
     public int update(PlayerShip p){
@@ -83,7 +83,7 @@ public class College {
         else{
             if (p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100){
                 if (reloadTime == 0){
-                    reloadTime = 30;
+                    reloadTime = 50;
                     firing = true;
                 }
                 else{
@@ -128,10 +128,10 @@ public class College {
      * */
     public Projectile shoot (Vector2 pos){
         return new Projectile (
-                tilePosition.x + 2, // to make the projectile start off from the top of the tower visually
-                tilePosition.y + 2, // see above
-                pos.y - tilePosition.x - 0.5f, // to make the projectile aim at the center of the ship
-                pos.x - tilePosition.y - 0.5f, // see above
+                tilePosition.x + 0.5f, // to make the projectile start off from the top of the tower visually
+                tilePosition.y + 0.5f, // see above
+                pos.y - tilePosition.x, // to make the projectile aim at the center of the ship
+                pos.x - tilePosition.y, // see above
                 false // needed so that buildings do not hurt each other
         );
     }

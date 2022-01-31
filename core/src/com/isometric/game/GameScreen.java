@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -44,6 +45,7 @@ public class GameScreen extends ScreenAdapter {
 
     private Stage stage;
     private Stage lossStage;
+    private Stage winStage;
 
     public static final int HEIGHT = 180 * 5;
     public static final int WIDTH = 320 * 5;
@@ -62,7 +64,7 @@ public class GameScreen extends ScreenAdapter {
     Texture texture;
     float totalHealth = 10;
     //    float enemyDamage = 1;
-    float currentHealth = 1;
+    float currentHealth = totalHealth;
     int score = 0;
     int gold = 0;
 
@@ -78,7 +80,8 @@ public class GameScreen extends ScreenAdapter {
     final TextButton howToPlayButton = new TextButton("How to Play", skin);
     final TextButton quitButton = new TextButton("Quit Game", skin);
 //    final TextButton regenerateButton = new TextButton("Generate New Map", skin);
-    final TextButton mainMenuButton = new TextButton("Main Menu", skin);
+    final TextButton lossMainMenuButton = new TextButton("Main Menu", skin);
+    final TextButton winMainMenuButton = new TextButton("Main Menu", skin);
 
 
     @Override
@@ -185,19 +188,56 @@ public class GameScreen extends ScreenAdapter {
         lossTable.align(Align.center|Align.top);
         lossTable.setPosition(0,Gdx.graphics.getHeight());
 
-        mainMenuButton.addListener(new ClickListener() {
+        lossMainMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.input.setInputProcessor(stage);
                 currentHealth = totalHealth;
                 renderer = new IsometricRenderer(false);
                 player = new PlayerShip(renderer);
+                colleges = place_colleges(5);
+                coins = placeCoins(20);
+                balls = new ArrayList<>();
+                gold = 0;
+                score = 0;
                 currentScreen = Screen.MAIN_MENU;
             }
         });
 
-        lossTable.add(mainMenuButton).padTop(450);
+        winMainMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.input.setInputProcessor(stage);
+                currentHealth = totalHealth;
+                renderer = new IsometricRenderer(false);
+                player = new PlayerShip(renderer);
+                colleges = place_colleges(5);
+                coins = placeCoins(20);
+                balls = new ArrayList<>();
+                gold = 0;
+                score = 0;
+                currentScreen = Screen.MAIN_MENU;
+            }
+        });
+
+        Label youDiedLabel = new Label("Oh no! Our Ship! It's broken!", skin);
+        lossTable.add(youDiedLabel).padTop(150);
+        lossTable.row();
+        lossTable.add(lossMainMenuButton).padTop(20);
         lossStage.addActor(lossTable);
+
+        winStage = new Stage(new ScreenViewport());
+        Table winTable = new Table();
+        winTable.setWidth(stage.getWidth());
+        winTable.align(Align.center|Align.top);
+        winTable.setPosition(0,Gdx.graphics.getHeight());
+
+        Label youWinLabel = new Label("Congratulations! You have defeated all your enemies.", skin);
+        winTable.add(youWinLabel).padTop(150);
+        winTable.row();
+        winTable.add(winMainMenuButton).padTop(20);
+        winStage.addActor(winTable);
+
 
 //        Background Music
         BackgroundMusic.setLooping(true);
@@ -244,11 +284,21 @@ public class GameScreen extends ScreenAdapter {
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
         stage.getViewport().update(width,height);
         lossStage.getViewport().update(width, height);
+        winStage.getViewport().update(width,height);
         viewport.update(width, height);
     }
 
     @Override
     public void render(float delta) {
+        if (score > 1500) {
+            Gdx.input.setInputProcessor(winStage);
+            playButton.setTouchable(Touchable.disabled);
+            howToPlayButton.setTouchable(Touchable.disabled);
+            muteButton.setTouchable(Touchable.disabled);
+            quitButton.setTouchable(Touchable.disabled);
+            currentScreen = Screen.WIN_SCREEN;
+        }
+
 
         if (currentHealth < 0.1) {
             isPlayerDead = true;
@@ -349,6 +399,12 @@ public class GameScreen extends ScreenAdapter {
             batchRender();
             lossStage.act(delta);
             lossStage.draw();
+        } else if (currentScreen == Screen.WIN_SCREEN) {
+            camera.position.set(player.position.x, player.position.y, 0);
+            camera.update();
+            batchRender();
+            winStage.act(delta);
+            winStage.draw();
         }
     }
 
@@ -457,7 +513,7 @@ public class GameScreen extends ScreenAdapter {
                 }
             }
             //noinspection SuspiciousNameCombination
-            if ((player.tilePosition.epsilonEquals(ball.nearestTile().y, ball.nearestTile().x, 1.0f)) && !(ball.isByPlayer())){
+            if ((player.tilePosition.epsilonEquals(ball.nearestTile().y, ball.nearestTile().x, 0.5f)) && !(ball.isByPlayer())){
                 if (currentHealth > 0) {
                     currentHealth -= 0.5;
                 }

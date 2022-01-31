@@ -83,12 +83,11 @@ public class GameScreen extends ScreenAdapter {
         viewport.apply();
         renderer = new IsometricRenderer(false);
         player = new PlayerShip(renderer);
-        playerBox = new Polygon(new float[]{player.position.x, player.position.y - 32, player.position.x + 64, player.position.y, player.position.x, player.position.y + 32, player.position.x -64, player.position.y});
-        EnemyShip enemy1 = new EnemyShip(renderer);
-        EnemyShip enemy2 = new EnemyShip(renderer);
-        EnemyShip enemy3 = new EnemyShip(renderer);
-        EnemyShip enemy4 = new EnemyShip(renderer);
-        EnemyShip enemy5 = new EnemyShip(renderer);
+        EnemyShip enemy1 = new EnemyShip(renderer, player);
+        EnemyShip enemy2 = new EnemyShip(renderer, player);
+        EnemyShip enemy3 = new EnemyShip(renderer, player);
+        EnemyShip enemy4 = new EnemyShip(renderer, player);
+        EnemyShip enemy5 = new EnemyShip(renderer, player);
         enemyShips = new Array<>();
         enemyShips.add(enemy1);
         enemyShips.add(enemy2);

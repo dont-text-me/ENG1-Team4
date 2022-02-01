@@ -21,10 +21,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 
 import java.util.*;
 
@@ -49,6 +52,10 @@ public class GameScreen extends ScreenAdapter {
     private Stage lossStage;
     private Stage winStage;
     private Stage howToPlayStage;
+    private Stage GUIStage;
+    private Label Score;
+    private Label Gold;
+    private Label Objectives;
 
     public static final int HEIGHT = 900;
     public static final int WIDTH = 1600;
@@ -65,6 +72,7 @@ public class GameScreen extends ScreenAdapter {
     private ShapeRenderer shapeRendererS;
 
     Texture texture;
+    Texture healthbar;
     float totalHealth = 10;
     //    float enemyDamage = 1;
     float currentHealth = totalHealth;
@@ -101,7 +109,7 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
 //        GAME
         camera = new OrthographicCamera(WIDTH, HEIGHT);
-//        viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
+//      viewport =  new ExtendViewport(WIDTH,HEIGHT,camera);
         viewport = new ScreenViewport(camera);
         viewport.apply();
         renderer = new IsometricRenderer(false);
@@ -129,7 +137,7 @@ public class GameScreen extends ScreenAdapter {
 
         int p = 20;
         table.pad(350);
-        Label title = new Label("A game by Team Pirate Hygene", skin);
+        Label title = new Label("A game by Team Pirate Hygiene", skin);
         table.add(title).padBottom(p);
         table.row();
         table.add(playButton).padBottom(p);
@@ -190,7 +198,7 @@ public class GameScreen extends ScreenAdapter {
         Label welcome = new Label("Welcome to Pirates!", skin);
         howToPlayTable.add(welcome).padTop(150);
         howToPlayTable.row();
-        Label controls1 = new Label("Use WSAD to Move,", skin);
+        Label controls1 = new Label("Use WASD to Move,", skin);
         howToPlayTable.add(controls1).padTop(50);
         howToPlayTable.row();
         Label controls2 = new Label("Collect 5 coins and then use 'Space' to fire your cannon", skin);
@@ -204,6 +212,33 @@ public class GameScreen extends ScreenAdapter {
         howToPlayTable.row();
         howToPlayTable.add(howToPlayMainMenuButton).padTop(50);
         howToPlayStage.addActor(howToPlayTable);
+
+        GUIStage = new Stage(new ScreenViewport());
+        Table GUITable = new Table();
+        Table ObjectivesTable = new Table();
+        GUITable.setWidth(stage.getWidth());
+        GUITable.align(Align.left|Align.top);
+        GUITable.setPosition(0,Gdx.graphics.getHeight());
+        ObjectivesTable.setWidth(stage.getWidth());
+        ObjectivesTable.align(Align.center|Align.top);
+        ObjectivesTable.setPosition(0,Gdx.graphics.getHeight());
+        texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
+        Image image = new Image(texture);
+        GUITable.add(image).padTop(27).padLeft(WIDTH - 1545);
+        Gold = new Label("x " + gold, skin);
+        Gold.setFontScale(0.75f,0.75f);
+        GUITable.add(Gold).padTop(20).padLeft(WIDTH - 1580);
+        Objectives = new Label("Collect 5 Coins!", skin);
+        Objectives.setAlignment(Align.left);
+        ObjectivesTable.add(Objectives).padTop(20);
+        Score = new Label("Score: " + score, skin);
+        Score.setFontScale(0.75f,0.75f);
+        GUITable.add(Score).padTop(20).padLeft(WIDTH-450);
+        GUITable.row();
+        GUIStage.addActor(ObjectivesTable);
+        GUIStage.addActor(GUITable);
+
+
 
 //        This enables and old in-dev regenerate button that procedurally generates terrain.
 //        Enable at your own peril.
@@ -289,7 +324,7 @@ public class GameScreen extends ScreenAdapter {
         batchS = new SpriteBatch();
         fontS = new BitmapFont();
         fontS.getData().scale(1);
-        texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
+        //texture = new Texture(Gdx.files.internal("Gold/Gold_1.png"));
         colleges = place_colleges(5);
         coins = placeCoins(20);
         balls = new ArrayList<>();
@@ -329,6 +364,7 @@ public class GameScreen extends ScreenAdapter {
             enemyShip.render(batch);
         }
         batch.end();
+
     }
 
     @Override
@@ -338,6 +374,7 @@ public class GameScreen extends ScreenAdapter {
         lossStage.getViewport().update(width, height);
         winStage.getViewport().update(width,height);
         howToPlayStage.getViewport().update(width,height);
+        GUIStage.getViewport().update(WIDTH, HEIGHT);
         viewport.update(width, height);
     }
 
@@ -421,19 +458,35 @@ public class GameScreen extends ScreenAdapter {
             handleInput();
 //      All rendering in libgdx is done in the sprite batch
             batchRender();
-            batchS.begin();
-            fontS.draw(batchS, ("SCORE: " + score), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight() - 50);
-            fontS.draw(batchS, (("X ") + gold), Gdx.graphics.getWidth() - 1480, Gdx.graphics.getHeight() - 50);
-            batchS.draw(texture, Gdx.graphics.getWidth() - 1550, Gdx.graphics.getHeight() - 85);
-            batchS.end();
+            //batchS.begin();
+            //fontS.draw(batchS, ("SCORE: " + score), Gdx.graphics.getWidth() - 250, Gdx.graphics.getHeight() - 50);
+            //fontS.draw(batchS, (("X ") + gold), Gdx.graphics.getWidth() - 1480, Gdx.graphics.getHeight() - 50);
+            //batchS.draw(texture, Gdx.graphics.getWidth() - 1550, Gdx.graphics.getHeight() - 85);
+            //batchS.end();
+
             shapeRendererS.begin(ShapeRenderer.ShapeType.Filled);
             shapeRendererS.setColor(0, 1, 0, 1);
-            shapeRendererS.rect(Gdx.graphics.getWidth() / 2f - 250, 50, (currentHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.rect(WIDTH / 2f - 250, 50, (currentHealth * 50), 20); //draw health bar rectangle
             shapeRendererS.end();
+
             shapeRendererS.begin(ShapeRenderer.ShapeType.Line);
             shapeRendererS.setColor(1, 1, 1, 1);
-            shapeRendererS.rect(Gdx.graphics.getWidth() / 2f - 248, 49, (totalHealth * 50), 20); //draw health bar rectangle
+            shapeRendererS.rect(WIDTH / 2f - 250, 50, (totalHealth * 50), 20);
             shapeRendererS.end();
+
+            Objectives.setVisible(false);
+
+            if (Gdx.input.isKeyPressed(Input.Keys.O)){
+                Objectives.setVisible(true);
+            }
+            if (gold >= 5){
+                Objectives.setText("Score 1500 Points!");
+            }
+            Score.setText("Score: " + score);
+            Gold.setText("x " + gold);
+            GUIStage.act(delta);
+            GUIStage.draw();
+
             //
         } else if (currentScreen == Screen.MAIN_MENU || currentScreen == Screen.PAUSE_MENU) {
             playButton.setTouchable(Touchable.enabled);

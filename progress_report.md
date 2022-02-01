@@ -7,7 +7,7 @@ title: Progress report
    <summary>Aut/9</summary>
   
       * Stuff for week 9
-      <img src = "gantt_initial.png" alt = "intial plan outline">
+      <img src = "ENG1-Team4/assets/gantt_initial.png" alt = "intial plan outline">
     
 * <details>
       

@@ -8,13 +8,13 @@ title: Artwork and assets used
  
 * <details>
   <summary>Sound effects (click to expand)</summary>
- 
-  * Coin <a href="https://freesound.org/people/ProjectsU012/sounds/341695/">collection</a>
-  * Water <a href="https://freesound.org/people/CGEffex/sounds/93082/">splashes</a>
-  * Retro damage <a href="https://freesound.org/people/timgormly/sounds/170148/">effect</a>
-  * Retro <a href="https://freesound.org/people/DeVern/sounds/517664/">cannon</a>
-  * Button <a href="https://freesound.org/people/Jofae/sounds/367852/">press</a>
- 
+  <ul>
+  <li> Coin <a href="https://freesound.org/people/ProjectsU012/sounds/341695/">collection</a> </li>
+  <li> Water <a href="https://freesound.org/people/CGEffex/sounds/93082/">splashes</a> </li>
+  <li> Retro damage <a href="https://freesound.org/people/timgormly/sounds/170148/">effect</a> </li>
+  <li> Retro <a href="https://freesound.org/people/DeVern/sounds/517664/">cannon</a> </li>
+  <li> Button <a href="https://freesound.org/people/Jofae/sounds/367852/">press</a> </li>
+  </ul>
  </details>
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

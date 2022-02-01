@@ -7,7 +7,7 @@ title: Progress report
    <summary>Aut/9</summary>
   
       * Stuff for week 9
-      
+      <img src = "gantt_initial.png">
     
 * <details>
       

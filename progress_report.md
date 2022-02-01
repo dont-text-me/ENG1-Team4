@@ -12,10 +12,10 @@ The closeness to completion for each task is represented by its shading in green
 
 * Week 1 (Aut/9)
   * During the first week, the team made significant progress on picking the design direction of the game. Alex also started working on initialising the Java workspace for the project and adapting the tileset we sourced. The plan for the rest of the project is provided below:
-  ![plan week 1](/ENG1-Team4/docs/assets/gantt_w1.png)
+  * ![plan week 1](/ENG1-Team4/docs/assets/gantt_w1.png)
 * Week 2 (Aut/10)
   * During the second week, we continued working on the map to ensure we have a strong foundation for the rest of the project to build on. We also fully settled on our product requirements and made progress on some of the documentation deliverables. The plan for the rest of the project is provided below:
-  ![plan week 2](/ENG1-Team4/docs/assets/gantt_w2.png)
+  * ![plan week 2](/ENG1-Team4/docs/assets/gantt_w2.png)
 * Week 3 (Spr/1)
   * 
 * Week 4 (Spr/2)

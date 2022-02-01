@@ -213,7 +213,7 @@ public class GameScreen extends ScreenAdapter {
         Label controls1 = new Label("Use WASD to Move,", skin);
         howToPlayTable.add(controls1).padTop(50);
         howToPlayTable.row();
-        Label controls2 = new Label("Collect 5 coins and then use 'Space' to fire your cannon", skin);
+        Label controls2 = new Label("Hold 'O' to see objectives - use 'Space' to fire your cannon", skin);
         howToPlayTable.add(controls2).padTop(50);
         howToPlayTable.row();
         Label controls3 = new Label("Use + or - to zoom the map.", skin);

@@ -7,9 +7,9 @@ title: Artwork and assets used
   * Published by Daniel Stephens under a Creative Commons Attribution-ShareAlike 3.0 Unported [license](https://creativecommons.org/licenses/by-sa/3.0/)
  
 * <details>
- <summary>Sound effects</summary>
+  <summary>Sound effects</summary>
  
- * Background [music](https://www.youtube.com/watch?v=8QCTY9hUjeQ)
-</details>
+  * Background [music](https://www.youtube.com/watch?v=8QCTY9hUjeQ)
+ </details>
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

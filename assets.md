@@ -9,12 +9,21 @@ title: Artwork and assets used
 * <details>
   <summary>Sound effects (click to expand)</summary>
   <ul>
-  <li> Coin <a href="https://freesound.org/people/ProjectsU012/sounds/341695/">collection</a> </li>
-  <li> Water <a href="https://freesound.org/people/CGEffex/sounds/93082/">splashes</a> </li>
-  <li> Retro damage <a href="https://freesound.org/people/timgormly/sounds/170148/">effect</a> </li>
-  <li> Retro <a href="https://freesound.org/people/DeVern/sounds/517664/">cannon</a> </li>
-  <li> Button <a href="https://freesound.org/people/Jofae/sounds/367852/">press</a> </li>
+  <li> 
+   Coin <a href="https://freesound.org/people/ProjectsU012/sounds/341695/">collection</a> - Published under an Attrubution 3.0 Unported <a href = "https://creativecommons.org/licenses/by/3.0/">licence</a>
+   </li>
+  <li> 
+   Water <a href="https://freesound.org/people/CGEffex/sounds/93082/">splashes</a> - Published under an Attrubution 3.0 Unported <a href = "https://creativecommons.org/licenses/by/3.0/">licence</a> 
+   </li>
+  <li> 
+   Retro damage <a href="https://freesound.org/people/timgormly/sounds/170148/">effect</a> - Published under an Attrubution 3.0 Unported <a href = "https://creativecommons.org/licenses/by/3.0/">licence</a> 
+   </li>
+  <li> 
+   Retro <a href="https://freesound.org/people/DeVern/sounds/517664/">cannon</a> - Published under a Universal public domain dedication <a href = "https://creativecommons.org/publicdomain/zero/1.0/">licence</a>
+   </li>
+  <li> 
+   Button <a href="https://freesound.org/people/Jofae/sounds/367852/">press</a> - Published under a Universal public domain dedication <a href = "https://creativecommons.org/publicdomain/zero/1.0/">licence</a>
+   </li>
   </ul>
- </details>
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

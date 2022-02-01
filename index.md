@@ -6,5 +6,5 @@ This webisite contains links to all **Assesment 1** deliverables as well as a we
 
 * [Deliverables](https://beep-boop-boop.github.io/ENG1-Team4/deliverables)
 * [Progress report](https://beep-boop-boop.github.io/ENG1-Team4/progress_report)
-* [Assets and artwork]((https://beep-boop-boop.github.io/ENG1-Team4/assets))
+* [Assets and artwork](https://beep-boop-boop.github.io/ENG1-Team4/assets)
 

@@ -1,6 +1,5 @@
 package com.isometric.game.desktop;
 
-//import com.badlogic.gdx.Game;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.isometric.game.GameScreen;

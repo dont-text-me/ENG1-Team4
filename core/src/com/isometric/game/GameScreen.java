@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -94,6 +93,7 @@ public class GameScreen extends ScreenAdapter {
 
     public Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
     final TextButton playButton = new TextButton("Play Game", skin);
+    final TextButton restartButton = new TextButton("Restart Level?", skin);
     final TextButton muteButton = new TextButton("Mute Music", skin);
     final TextButton howToPlayButton = new TextButton("How to Play", skin);
     final TextButton quitButton = new TextButton("Quit Game", skin);
@@ -136,11 +136,15 @@ public class GameScreen extends ScreenAdapter {
         table.setPosition(0,Gdx.graphics.getHeight());
 
         int p = 20;
-        table.pad(350);
+
+        table.pad(300);
         Label title = new Label("A game by Team Pirate Hygiene", skin);
+
         table.add(title).padBottom(p);
         table.row();
         table.add(playButton).padBottom(p);
+        table.row();
+        table.add(restartButton).padBottom(p);
         table.row();
         table.add(howToPlayButton).padBottom(p);
         table.row();
@@ -160,6 +164,14 @@ public class GameScreen extends ScreenAdapter {
             public void clicked(InputEvent event, float x, float y) {
                 currentScreen = Screen.MAIN_GAME;
                 buttonClick.play(0.1f);
+            }
+        });
+
+        restartButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                buttonClick.play(0.1f);
+                resetGame();
             }
         });
 
@@ -294,7 +306,7 @@ public class GameScreen extends ScreenAdapter {
         });
 
         Label youDiedLabel = new Label("Oh no! Our Ship! It's broken!", skin);
-        lossTable.add(youDiedLabel).padTop(150);
+        lossTable.add(youDiedLabel).padTop(450);
         lossTable.row();
         lossTable.add(lossMainMenuButton).padTop(20);
         lossStage.addActor(lossTable);
@@ -306,7 +318,7 @@ public class GameScreen extends ScreenAdapter {
         winTable.setPosition(0,Gdx.graphics.getHeight());
 
         Label youWinLabel = new Label("Congratulations! You have defeated all your enemies.", skin);
-        winTable.add(youWinLabel).padTop(150);
+        winTable.add(youWinLabel).padTop(450);
         winTable.row();
         winTable.add(winMainMenuButton).padTop(20);
         winStage.addActor(winTable);
@@ -507,12 +519,18 @@ public class GameScreen extends ScreenAdapter {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
             batchRender();
+            batchS.begin();
+            batchS.draw(darken, 50, 50, 1500, 700);
+            batchS.end();
             lossStage.act(delta);
             lossStage.draw();
         } else if (currentScreen == Screen.WIN_SCREEN) {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
             batchRender();
+            batchS.begin();
+            batchS.draw(darken, 50, 50, 1500, 700);
+            batchS.end();
             winStage.act(delta);
             winStage.draw();
         } else if (currentScreen == Screen.HOWTOPLAY_SCREEN) {
@@ -533,7 +551,7 @@ public class GameScreen extends ScreenAdapter {
         BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
         titleFont.setColor(Color.GOLD);
         titleFont.getData().setScale(2f, 2f);
-        titleFont.draw(batch, "Pirates", (viewport.getScreenWidth()/2f) - 375 , (viewport.getScreenHeight()/2f) + 200);
+        titleFont.draw(batch, "Pirates", (viewport.getScreenWidth()/2f) - 375 , (viewport.getScreenHeight()/2f) + 250);
         batch.end();
     }
 
@@ -567,7 +585,9 @@ public class GameScreen extends ScreenAdapter {
 
     private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
-            currentScreen = Screen.PAUSE_MENU;
+            if (currentScreen == Screen.MAIN_GAME) {
+                currentScreen = Screen.PAUSE_MENU;
+            }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))  {
             if (camera.zoom > 0.2) {camera.zoom -= 0.004f;}

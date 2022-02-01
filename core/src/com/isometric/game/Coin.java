@@ -27,7 +27,6 @@ public class Coin {
     }
 
     public boolean update(PlayerShip p) {
-//        System.out.println(p.tilePosition.toString() + tilePosition.toString());
         return (p.tilePosition.x == nearestTile().y + 1) && (p.tilePosition.y == nearestTile().x);
     }
 

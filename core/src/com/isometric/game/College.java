@@ -18,9 +18,8 @@ public class College {
     private int reloadTime; // prevents the college from continuously firing at the player when they are in range
     private boolean firing; // true when the college will shoot in a particular frame
 
-    Sound cannonFire = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/cannon_fire.wav"));
-    Sound defeatSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/castle_defeat.wav"));
-
+    private final Sound cannonFire = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/cannon_fire.wav"));
+    private final Sound defeatSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/castle_defeat.wav"));
 
     public College (int x, int y) {
         tilePosition = new Vector2(x, y);

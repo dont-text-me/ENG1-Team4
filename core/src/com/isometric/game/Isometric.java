@@ -11,7 +11,6 @@ public class Isometric extends Game {
 		batch = new SpriteBatch();
 		GameScreen gScreen = new GameScreen();
 		setScreen(gScreen);
-
 	}
 
 	@Override

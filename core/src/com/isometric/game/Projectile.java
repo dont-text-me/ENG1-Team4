@@ -25,8 +25,6 @@ public class Projectile {
         );
         delta = new Vector2(delta_x, delta_y);
         delta = delta.nor(); // normalising the vector so that all projectiles travel at the same speed
-//        delta.x = delta.x/8f;
-//        delta.y = delta.y/8f;
         delta.scl(1/8f);
         sprite = new Texture(Gdx.files.internal("cannon_ball/cannonBall_NE.png"));
         byPlayer = player;

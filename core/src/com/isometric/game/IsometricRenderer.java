@@ -42,16 +42,17 @@ public class IsometricRenderer {
      */
     @SuppressWarnings("unused")
     public void drawCoordinates(SpriteBatch batch, boolean drawTextCoords) {
-        float x;
-        float y;
-        for (int row = board_size; row >= 0; row--) {
-            for (int col = board_size; col >= 0; col--) {
-                x = (col - row) * (small_tile_width / 2f);
-                y = ((col + row) * (small_tile_height / 4f)) - 17 ;
-                if (drawTextCoords) {
+        if (drawTextCoords) {
+            float x;
+            float y;
+            for (int row = board_size; row >= 0; row--) {
+                for (int col = board_size; col >= 0; col--) {
+                    x = (col - row) * (small_tile_width / 2f);
+                    y = ((col + row) * (small_tile_height / 4f)) - 17;
                     coordsFont.draw(batch, ("(" + row + ", " + col + ")"), x + (small_tile_width / 2f), y + (small_tile_height / 2f));
+
+                    batch.draw(pinpoint, x, y);
                 }
-                batch.draw(pinpoint, x, y);
             }
         }
     }

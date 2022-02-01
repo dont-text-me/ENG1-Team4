@@ -13,6 +13,7 @@ import java.util.Random;
 public class PlayerShip{
 
     private final Texture[] shipImage = new Texture[16];
+    private final Sound splosh  = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/splosh (1).wav"));
     private int currentDirection = 0;
     public Vector2 position;
     public Vector2 tilePosition;
@@ -20,10 +21,6 @@ public class PlayerShip{
     private float _currentTime;
     public boolean canShoot = true;
     public int canShootCounter = 0;
-    @SuppressWarnings("FieldCanBeLocal")
-    private float alpha;
-
-    Sound splosh  = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/splosh (1).wav"));
 
     public PlayerShip(IsometricRenderer renderer){
 //        shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
@@ -45,11 +42,6 @@ public class PlayerShip{
         }
         position = new Vector2((tilePosition.y - tilePosition.x) * 32, (tilePosition.y + tilePosition.x) * 16);
         futurePosition = new Vector2(position.x, position.y);
-    }
-
-    private float calculateAlpha() {
-        _currentTime += Gdx.graphics.getDeltaTime();
-        return 0.6f / _currentTime;
     }
 
 

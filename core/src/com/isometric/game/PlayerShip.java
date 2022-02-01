@@ -2,6 +2,7 @@ package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -17,10 +18,12 @@ public class PlayerShip{
     public Vector2 tilePosition;
     public Vector2 futurePosition;
     private float _currentTime;
+    public boolean canShoot = true;
+    public int canShootCounter = 0;
     @SuppressWarnings("FieldCanBeLocal")
     private float alpha;
 
-
+    Sound splosh  = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/splosh (1).wav"));
 
     public PlayerShip(IsometricRenderer renderer){
 //        shipImage = new Texture(Gdx.files.internal("ship/ship_light_NW.png"));
@@ -87,6 +90,7 @@ public class PlayerShip{
                     tilePosition.x + 2 == nearestEnemyShip.tilePosition.x && tilePosition.y - 1 == nearestEnemyShip.tilePosition.y ||
                     tilePosition.x + 2 == nearestEnemyShip.tilePosition.x && tilePosition.y + 1 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "W")){
+                splosh.play(0.1f);
                 currentDirection = 0;
                 tilePosition.x += 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
@@ -95,7 +99,6 @@ public class PlayerShip{
         }
 
         else if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-
             if (tilePosition.x == 1){
 //                do nothing
                 assert true;
@@ -104,6 +107,7 @@ public class PlayerShip{
                     tilePosition.x - 2 == nearestEnemyShip.tilePosition.x && tilePosition.y - 1 == nearestEnemyShip.tilePosition.y ||
                     tilePosition.x - 2 == nearestEnemyShip.tilePosition.x && tilePosition.y + 1 == nearestEnemyShip.tilePosition.y){}
             else if(possibleMove(renderer, "S")){
+                splosh.play(0.1f);
                 currentDirection = 1;
                 tilePosition.x -= 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
@@ -120,6 +124,7 @@ public class PlayerShip{
                     tilePosition.x - 1  == nearestEnemyShip.tilePosition.x && tilePosition.y + 2 == nearestEnemyShip.tilePosition.y ||
                     tilePosition.x + 1 == nearestEnemyShip.tilePosition.x && tilePosition.y + 2 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "D")) {
+                splosh.play(0.1f);
                 currentDirection = 2;
                 tilePosition.y += 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
@@ -136,6 +141,7 @@ public class PlayerShip{
                     tilePosition.x - 1  == nearestEnemyShip.tilePosition.x && tilePosition.y - 2 == nearestEnemyShip.tilePosition.y ||
                     tilePosition.x + 1 == nearestEnemyShip.tilePosition.x && tilePosition.y - 2 == nearestEnemyShip.tilePosition.y){}
             else if (possibleMove(renderer, "A")) {
+                splosh.play(0.1f);
                 currentDirection = 3;
                 tilePosition.y -= 1;
                 futurePosition.x = (tilePosition.y - tilePosition.x) * 32;
@@ -143,7 +149,8 @@ public class PlayerShip{
             }
         }
     }
-//    This method checks if the next tile is water for a given move
+
+    //    This method checks if the next tile is water for a given move
     public boolean possibleMove(IsometricRenderer renderer, String input) {
         switch (input) {
             case "W": {

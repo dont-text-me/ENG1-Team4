@@ -1,6 +1,7 @@
 package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -16,6 +17,11 @@ public class College {
     private int health = 100;
     private int reloadTime; // prevents the college from continuously firing at the player when they are in range
     private boolean firing; // true when the college will shoot in a particular frame
+
+    Sound cannonFire = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/cannon_fire.wav"));
+    Sound defeatSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/castle_defeat.wav"));
+
+
     public College (int x, int y) {
         tilePosition = new Vector2(x, y);
         // converting tile position to screen position:
@@ -85,6 +91,7 @@ public class College {
                 if (reloadTime == 0){
                     reloadTime = 50;
                     firing = true;
+                    cannonFire.play(0.1f);
                 }
                 else{
                     reloadTime -= 1;
@@ -106,6 +113,9 @@ public class College {
     public void takeDamage(int dmg){
         if (health > 0) {
             health = health - dmg;
+            if (health <= 0) {
+                defeatSound.play(1f);
+            }
         }
     }
 

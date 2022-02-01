@@ -10,6 +10,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(GameScreen.WIDTH, GameScreen.HEIGHT);
+		config.setWindowSizeLimits(GameScreen.WIDTH, GameScreen.HEIGHT, 3840, 2160);
 		config.useVsync(true);
 //		DO NOT CHANGE THIS UNLESS YOU WANT THE WORLD'S FASTEST CANNONBALLS
 		config.setForegroundFPS(60);

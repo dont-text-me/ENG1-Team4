@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -33,7 +35,7 @@ public class GameScreen extends ScreenAdapter {
 
 
     enum Screen {
-        MAIN_MENU, MAIN_GAME, PAUSE_MENU, LOSE_SCREEN, WIN_SCREEN
+        MAIN_MENU, MAIN_GAME, PAUSE_MENU, LOSE_SCREEN, WIN_SCREEN, HOWTOPLAY_SCREEN;
     }
 
     Screen currentScreen = Screen.MAIN_MENU;
@@ -46,9 +48,10 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private Stage lossStage;
     private Stage winStage;
+    private Stage howToPlayStage;
 
-    public static final int HEIGHT = 180 * 5;
-    public static final int WIDTH = 320 * 5;
+    public static final int HEIGHT = 900;
+    public static final int WIDTH = 1600;
     public boolean MUTED = true;
     private IsometricRenderer renderer;
 
@@ -72,16 +75,26 @@ public class GameScreen extends ScreenAdapter {
     public ArrayList<Projectile> balls;
     public LinkedList<Coin> coins;
     private float point = 0f;
-    //Background Music
-    Music BackgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
+
+    //Background Music and Sounds
+    Music backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Sound Effects and Music/1700s sea shanties.mp3"));
+    Sound cannonFire = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/cannon_fire.wav"));
+    Sound coinCollect = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/coin_collect.wav"));
+    Sound hitHurt = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/hithurt.wav"));
+    Sound buttonClick = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/button.wav"));
+    Sound castleHit = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/castle_hit.wav"));
+
     public Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
     final TextButton playButton = new TextButton("Play Game", skin);
     final TextButton muteButton = new TextButton("Mute Music", skin);
     final TextButton howToPlayButton = new TextButton("How to Play", skin);
     final TextButton quitButton = new TextButton("Quit Game", skin);
-//    final TextButton regenerateButton = new TextButton("Generate New Map", skin);
+    //    final TextButton regenerateButton = new TextButton("Generate New Map", skin);
     final TextButton lossMainMenuButton = new TextButton("Main Menu", skin);
     final TextButton winMainMenuButton = new TextButton("Main Menu", skin);
+    final TextButton howToPlayMainMenuButton = new TextButton("Main Menu", skin);
+    final Texture darken = new Texture(Gdx.files.internal("darken.png"));
+
 
 
     @Override
@@ -116,6 +129,9 @@ public class GameScreen extends ScreenAdapter {
 
         int p = 20;
         table.pad(350);
+        Label title = new Label("A game by Team Pirate Hygene", skin);
+        table.add(title).padBottom(p);
+        table.row();
         table.add(playButton).padBottom(p);
         table.row();
         table.add(howToPlayButton).padBottom(p);
@@ -135,6 +151,7 @@ public class GameScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 currentScreen = Screen.MAIN_GAME;
+                buttonClick.play(0.1f);
             }
         });
 
@@ -148,9 +165,45 @@ public class GameScreen extends ScreenAdapter {
         howToPlayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("To Add");
+                Gdx.input.setInputProcessor(howToPlayStage);
+                currentScreen = Screen.HOWTOPLAY_SCREEN;
+                buttonClick.play(0.1f);
             }
         });
+
+        howToPlayStage = new Stage(new ScreenViewport());
+        Table howToPlayTable = new Table();
+        howToPlayTable.setWidth(stage.getWidth());
+        howToPlayTable.align(Align.center|Align.top);
+        howToPlayTable.setPosition(0,Gdx.graphics.getHeight());
+
+        howToPlayMainMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                buttonClick.play(0.1f);
+//                resetGame();
+                currentScreen = Screen.MAIN_MENU;
+                Gdx.input.setInputProcessor(stage);
+            }
+        });
+
+        Label welcome = new Label("Welcome to Pirates!", skin);
+        howToPlayTable.add(welcome).padTop(150);
+        howToPlayTable.row();
+        Label controls1 = new Label("Use WSAD to Move,", skin);
+        howToPlayTable.add(controls1).padTop(50);
+        howToPlayTable.row();
+        Label controls2 = new Label("Collect 5 coins and then use 'Space' to fire your cannon", skin);
+        howToPlayTable.add(controls2).padTop(50);
+        howToPlayTable.row();
+        Label controls3 = new Label("Use + or - to zoom the map.", skin);
+        howToPlayTable.add(controls3).padTop(50);
+        howToPlayTable.row();
+        Label controls4 = new Label("Collect 1500 points by destroying colleges to be victorious!", skin);
+        howToPlayTable.add(controls4).padTop(50);
+        howToPlayTable.row();
+        howToPlayTable.add(howToPlayMainMenuButton).padTop(50);
+        howToPlayStage.addActor(howToPlayTable);
 
 //        This enables and old in-dev regenerate button that procedurally generates terrain.
 //        Enable at your own peril.
@@ -170,12 +223,13 @@ public class GameScreen extends ScreenAdapter {
         muteButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                buttonClick.play(0.1f);
                 if (!MUTED) {
-                    BackgroundMusic.setVolume(0f);
+                    backgroundMusic.setVolume(0f);
                     MUTED = true;
                     muteButton.setText("Muted Music");
                 } else {
-                    BackgroundMusic.setVolume(0.2f);
+                    backgroundMusic.setVolume(0.2f);
                     MUTED = false;
                     muteButton.setText("Playing Music");
                 }
@@ -191,32 +245,16 @@ public class GameScreen extends ScreenAdapter {
         lossMainMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.input.setInputProcessor(stage);
-                currentHealth = totalHealth;
-                renderer = new IsometricRenderer(false);
-                player = new PlayerShip(renderer);
-                colleges = place_colleges(5);
-                coins = placeCoins(20);
-                balls = new ArrayList<>();
-                gold = 0;
-                score = 0;
-                currentScreen = Screen.MAIN_MENU;
+                buttonClick.play(0.1f);
+                resetGame();
             }
         });
 
         winMainMenuButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.input.setInputProcessor(stage);
-                currentHealth = totalHealth;
-                renderer = new IsometricRenderer(false);
-                player = new PlayerShip(renderer);
-                colleges = place_colleges(5);
-                coins = placeCoins(20);
-                balls = new ArrayList<>();
-                gold = 0;
-                score = 0;
-                currentScreen = Screen.MAIN_MENU;
+                buttonClick.play(0.1f);
+                resetGame();
             }
         });
 
@@ -240,9 +278,10 @@ public class GameScreen extends ScreenAdapter {
 
 
 //        Background Music
-        BackgroundMusic.setLooping(true);
-        BackgroundMusic.setVolume(0f);
-        BackgroundMusic.play();
+        backgroundMusic.setLooping(true);
+        MUTED = false;
+        backgroundMusic.setVolume(0.2f);
+        backgroundMusic.play();
 
 //        In game GUI
         shapeRendererS = new ShapeRenderer();
@@ -254,6 +293,19 @@ public class GameScreen extends ScreenAdapter {
         colleges = place_colleges(5);
         coins = placeCoins(20);
         balls = new ArrayList<>();
+    }
+
+    private void resetGame() {
+        Gdx.input.setInputProcessor(stage);
+        currentHealth = totalHealth;
+        renderer = new IsometricRenderer(false);
+        player = new PlayerShip(renderer);
+        colleges = place_colleges(5);
+        coins = placeCoins(20);
+        balls = new ArrayList<>();
+        gold = 0;
+        score = 0;
+        currentScreen = Screen.MAIN_MENU;
     }
 
     private void batchRender() {
@@ -285,6 +337,7 @@ public class GameScreen extends ScreenAdapter {
         stage.getViewport().update(width,height);
         lossStage.getViewport().update(width, height);
         winStage.getViewport().update(width,height);
+        howToPlayStage.getViewport().update(width,height);
         viewport.update(width, height);
     }
 
@@ -312,10 +365,10 @@ public class GameScreen extends ScreenAdapter {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
             if (!MUTED) {
-                BackgroundMusic.setVolume(0f);
+                backgroundMusic.setVolume(0f);
                 MUTED = true;
             } else {
-                BackgroundMusic.setVolume(0.2f);
+                backgroundMusic.setVolume(0.2f);
                 MUTED = false;
             }
         }
@@ -354,6 +407,7 @@ public class GameScreen extends ScreenAdapter {
                 if (coins.get(j).update(player)) {
                     //noinspection SuspiciousListRemoveInLoop
                     coins.remove(j);
+                    long id = coinCollect.play(0.2f);
                     gold += 1;
                     score += 50;
                 }
@@ -389,6 +443,9 @@ public class GameScreen extends ScreenAdapter {
             camera.position.set(player.position.x, player.position.y, 0);
             camera.update();
             batchRender();
+            batchS.begin();
+            batchS.draw(darken, 50, 50, 1500, 700);
+            batchS.end();
             stage.act(delta);
             stage.draw();
             //TITLE
@@ -405,7 +462,16 @@ public class GameScreen extends ScreenAdapter {
             batchRender();
             winStage.act(delta);
             winStage.draw();
-        }
+        } else if (currentScreen == Screen.HOWTOPLAY_SCREEN) {
+            camera.position.set(player.position.x, player.position.y, 0);
+            camera.update();
+            batchRender();
+            batchS.begin();
+            batchS.draw(darken, 50, 50, 1500, 700);
+            batchS.end();
+            howToPlayStage.act(delta);
+            howToPlayStage.draw();
+    }
     }
 
     private void drawTitle() {
@@ -414,7 +480,7 @@ public class GameScreen extends ScreenAdapter {
         BitmapFont titleFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
         titleFont.setColor(Color.GOLD);
         titleFont.getData().setScale(2f, 2f);
-        titleFont.draw(batch, "Pirate Hygiene", 150, 800);
+        titleFont.draw(batch, "Pirates", (viewport.getScreenWidth()/2f) - 375 , (viewport.getScreenHeight()/2f) + 200);
         batch.end();
     }
 
@@ -450,15 +516,31 @@ public class GameScreen extends ScreenAdapter {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             currentScreen = Screen.PAUSE_MENU;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("="))) {camera.zoom -= 0.004f;}
-        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {camera.zoom += 0.004f;}
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("=")))  {
+            if (camera.zoom > 0.2) {camera.zoom -= 0.004f;}
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.valueOf("-"))) {
+            if (camera.zoom < .7) {camera.zoom += 0.004f;}
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            balls.add(new Projectile(
-                    player.tilePosition.y + 1f,
-                    player.tilePosition.x + 0.25f,
-                    player.getCurrentDirection() == 2f ? 1f : (player.getCurrentDirection() == 3f ? -1f : 0f),
-                    player.getCurrentDirection() == 0f ? 1f : (player.getCurrentDirection() == 1f ? -1f : 0f),
-                    true));
+            if (gold >= 5) {
+                if (player.canShoot) {
+                    long id = cannonFire.play(0.2f);
+                    player.canShoot = false;
+                    balls.add(new Projectile(
+                            player.tilePosition.y + 1f,
+                            player.tilePosition.x + 0.25f,
+                            player.getCurrentDirection() == 2f ? 1f : (player.getCurrentDirection() == 3f ? -1f : 0f),
+                            player.getCurrentDirection() == 0f ? 1f : (player.getCurrentDirection() == 1f ? -1f : 0f),
+                            true));
+                } else {
+                    player.canShootCounter ++;
+                    if (player.canShootCounter > 3) {
+                        player.canShootCounter = 0;
+                        player.canShoot = true;
+                    }
+                }
+            }
         }
     }
 
@@ -507,7 +589,8 @@ public class GameScreen extends ScreenAdapter {
             for (College college : colleges) {
                 if (college.getTilePosition().epsilonEquals(ball.nearestTile().x, ball.nearestTile().y, 1.0f)){ // giving the player a little help aiming
                     if (ball.isByPlayer()) {
-                        college.takeDamage(5);
+                        college.takeDamage(15);
+                        castleHit.play(0.3f);
                         ball.deactivate();
                     }
                 }
@@ -516,6 +599,7 @@ public class GameScreen extends ScreenAdapter {
             if ((player.tilePosition.epsilonEquals(ball.nearestTile().y, ball.nearestTile().x, 0.5f)) && !(ball.isByPlayer())){
                 if (currentHealth > 0) {
                     currentHealth -= 0.5;
+                    hitHurt.play(0.1f);
                 }
                 ball.deactivate();
                 // Player takes damage here

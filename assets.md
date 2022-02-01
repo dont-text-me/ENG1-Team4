@@ -7,9 +7,14 @@ title: Artwork and assets used
   * Published by Daniel Stephens under a Creative Commons Attribution-ShareAlike 3.0 Unported [license](https://creativecommons.org/licenses/by-sa/3.0/)
  
 * <details>
-  <summary>Sound effects</summary>
+  <summary>Sound effects (click to expand)</summary>
  
-  * Background [music](https://www.youtube.com/watch?v=8QCTY9hUjeQ)
+  * Coin <a href="https://freesound.org/people/ProjectsU012/sounds/341695/">collection</a>
+  * Water <a href="https://freesound.org/people/CGEffex/sounds/93082/">splashes</a>
+  * Retro damage <a href="https://freesound.org/people/timgormly/sounds/170148/">effect</a>
+  * Retro <a href="https://freesound.org/people/DeVern/sounds/517664/">cannon</a>
+  * Button <a href="https://freesound.org/people/Jofae/sounds/367852/">press</a>
+ 
  </details>
 
 [Home](https://beep-boop-boop.github.io/ENG1-Team4/)

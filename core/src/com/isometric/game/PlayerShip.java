@@ -29,17 +29,11 @@ public class PlayerShip{
         shipImage[2] = new Texture(Gdx.files.internal("ship/ship_light_NE.png"));
         shipImage[3] = new Texture(Gdx.files.internal("ship/ship_light_SW.png"));
 
+//        Player starts top left
         tilePosition = new Vector2();
-        //Randomly setting ships' tile position
-        while (tilePosition.x == 0 && tilePosition.y == 0 ){
-            int x = new Random().nextInt(61) + 1;
-            String row = renderer.map[x];
-            int y = new Random().nextInt(61) + 1;
-            if (Character.getNumericValue(row.charAt(y)) == 9){
-                tilePosition.x = x;
-                tilePosition.y = y;
-            }
-        }
+        tilePosition.x = 60;
+        tilePosition.y = 5 ;
+
         position = new Vector2((tilePosition.y - tilePosition.x) * 32, (tilePosition.y + tilePosition.x) * 16);
         futurePosition = new Vector2(position.x, position.y);
     }

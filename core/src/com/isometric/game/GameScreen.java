@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 
-@SuppressWarnings({"CommentedOutCode", "DuplicatedCode"})
+@SuppressWarnings({"DuplicatedCode"})
 public class GameScreen extends ScreenAdapter {
 
     enum Screen {
@@ -87,7 +87,6 @@ public class GameScreen extends ScreenAdapter {
     //    final TextButton regenerateButton = new TextButton("Generate New Map", skin);
 
     private final Texture darken = new Texture(Gdx.files.internal("darken.png"));
-
 
     @Override
     public void show() {
@@ -291,6 +290,9 @@ public class GameScreen extends ScreenAdapter {
         balls = new ArrayList<>();
     }
 
+    /**
+     * Resets the game.
+     */
     private void resetGame() {
         Gdx.input.setInputProcessor(stage);
         currentHealth = totalHealth;
@@ -304,6 +306,10 @@ public class GameScreen extends ScreenAdapter {
         currentScreen = Screen.MAIN_MENU;
     }
 
+    /**
+     * Draws all major graphics.
+     * This method was extracted to make code cleaner due to its repetition.
+     */
     private void batchRender() {
         batch.begin();
         renderer.drawBoard(batch);
@@ -329,6 +335,11 @@ public class GameScreen extends ScreenAdapter {
 
     }
 
+    /**
+     * Resize overload to ensure stages are properly scaled.
+     * @param width passed by LibGDX on resize
+     * @param height passed by LibGDX on resize
+     */
     @Override
     public void resize(int width, int height){
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
@@ -340,6 +351,13 @@ public class GameScreen extends ScreenAdapter {
         viewport.update(width, height);
     }
 
+    /**
+     * Main render function.
+     * Renders all graphics on screen.
+     * @param delta The time between frames.
+     *              Be aware the app is fps limited to keep this consistent.
+     *              See Desktop Launcher.
+     */
     @Override
     public void render(float delta) {
 //        Check for win
@@ -488,6 +506,9 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
+    /**
+     * Draws the title word "Pirates"
+     */
     private void drawTitle() {
         batch = new SpriteBatch();
         batch.begin();
@@ -498,6 +519,11 @@ public class GameScreen extends ScreenAdapter {
         batch.end();
     }
 
+    /**
+     * Places gold coins over the map for users to collect to enable their cannon.
+     * @param num number of coins to place
+     * @return THe linked list of coin objects that are currently rendered.
+     */
     public LinkedList<Coin> placeCoins(int num) {
         LinkedList<Coin> generatedCoins = new LinkedList<>();
         Vector2[] coinLocations = new Vector2[num];
@@ -520,10 +546,9 @@ public class GameScreen extends ScreenAdapter {
         return generatedCoins;
     }
 
-    @Override
-    public void dispose() {}
-
-
+    /**
+     * Handles user input for GUI keys, such as ESC and firing of the cannon with space.
+     */
     private void handleInput() {
         if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
             if (currentScreen == Screen.MAIN_GAME) {
@@ -584,8 +609,20 @@ public class GameScreen extends ScreenAdapter {
                 }
             }
         }
+        LinkedList<String> collegeNames = new LinkedList<>();
+        Random random = new Random();
+        collegeNames.add("Alcuin");
+        collegeNames.add("Derwent");
+        collegeNames.add("Constantine");
+        collegeNames.add("Goodricke");
+        collegeNames.add("Anne Lister");
+        collegeNames.add("James");
+        collegeNames.add("Langwith");
+        collegeNames.add("Halifax");
+        collegeNames.add("Wentworth");
         for (int i = 0; i < num; i ++){
-            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y);
+            int selection = random.nextInt(collegeNames.size());
+            colleges[i] = new College((int)college_locations[i].x, (int)college_locations[i].y, collegeNames.remove(selection));
         }
         return colleges;
     }

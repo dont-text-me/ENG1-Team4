@@ -2,7 +2,9 @@ package com.isometric.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 
@@ -10,6 +12,8 @@ import com.badlogic.gdx.math.Vector2;
 public class College {
     public static final int small_tile_width = 64;
     public static final int small_tile_height = 64;
+    private final String collegeName;
+    private final BitmapFont collegeNameFont = new BitmapFont(Gdx.files.internal("gothicpirate.fnt"), false);
     private final Texture sprite;
     private final Vector2 position;
     private final Vector2 tilePosition;
@@ -21,7 +25,8 @@ public class College {
     private final Sound cannonFire = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/cannon_fire.wav"));
     private final Sound defeatSound = Gdx.audio.newSound(Gdx.files.internal("Sound Effects and Music/castle_defeat.wav"));
 
-    public College (int x, int y) {
+    public College (int x, int y, String collegeName) {
+        this.collegeName = collegeName;
         tilePosition = new Vector2(x, y);
         // converting tile position to screen position:
         float pos_x;
@@ -41,6 +46,8 @@ public class College {
      * */
     public void render(SpriteBatch batch, PlayerShip p){
         batch.draw(sprite, position.x, position.y);
+        collegeNameFont.getData().setScale(0.5f, 0.5f);
+        collegeNameFont.draw(batch, collegeName, (position.x - (small_tile_width / 4f)) , (position.y + (small_tile_height) + 35));
         if (health == 100){
             batch.draw(
                     new Texture(Gdx.files.internal("healthbar_components/green.png")),
@@ -73,7 +80,7 @@ public class College {
                     position.y + small_tile_height -10); // drawing out the white flag for defeated colleges
         }
         if ((p.tilePosition.dst2(tilePosition.y, tilePosition.x) <= 100) && (health > 0)) {
-            batch.draw(new Texture(Gdx.files.internal("college_building/firing_marker.png")), position.x + 16, position.y + 70); // when this is rendered, college is about to shoot the player
+            batch.draw(new Texture(Gdx.files.internal("college_building/firing_marker.png")), position.x + 16, position.y + 100); // when this is rendered, college is about to shoot the player
         }
     }
 

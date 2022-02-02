@@ -443,6 +443,9 @@ public class GameScreen extends ScreenAdapter {
             if (Gdx.input.isKeyPressed(Input.Keys.O)){
                 Objectives.setVisible(true);
             }
+            if (gold < 5){
+                Objectives.setText("Collect 5 Coins!");
+            }
             if (gold >= 5){
                 Objectives.setText("Score 1500 Points!");
             }
